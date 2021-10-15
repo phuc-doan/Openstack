@@ -1,4 +1,4 @@
-# Openstack-
+# Openstack
 > ## **Topics covered**: `Week 3`
 > #### **1. IaaS (Openstack)**
 > #### **2. SDN (Software-defined Network) - OpenvSwitch**
