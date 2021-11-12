@@ -4,7 +4,7 @@
 > #### **2. SDN (Software-defined Network) - OpenvSwitch**
 > ## **Tasks**
 > > Week 3 training program includes 2 sections, as described below:
-> 
+
 > ### 1. IaaS:
 > * [x]  Deploy Openstack in All-in-one Architecture
 > * [x]  Doc on Deployment
