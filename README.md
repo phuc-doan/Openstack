@@ -9,7 +9,7 @@
 > * [x]  Deploy Openstack in All-in-one Architecture
 > * [x]  Doc on Deployment
 >   
->   * **Path**: `Week-3/Julian-P-Nguyen/Openstack/`
+>  
 > 
 > ### 2. SDN:
 > * [x]  Set up a VXLAN network between 2 VMs
