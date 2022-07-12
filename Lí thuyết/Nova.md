@@ -45,9 +45,22 @@ Sau khi xác thực thành công, client sẽ gửi request khởi chạy máy �
 - **`nova-scheduler`** thông qua filters và weights để tìm compute host phù hợp nhất chạy instance. Đồng thời trên database sẽ cập nhật lại entry của instance với host ID nhận được từ **`nova-scheduler`**. Sau đó **`nova-scheduler`** gửi RPC call tới **`nova-compute`** để khởi tạo máy ảo.
 - **`nova-conductor`** lấy request từ message queue.
 - **`nova-conductor`** lấy thông tin instance từ database sau đó gửi về cho **`nova-compute`**
-- **`nova-compute`** lấy thông tin máy ảo từ queue. Tại thời điểm này, compute host đã biết được image nào sẽ được sử dụng để chạy instance. **`nova-compute`** sẽ hỏi tới **`glance-api`** để lấy url của image .
+- **`nova-compute`** lấy thông tin máy ảo từ queue. Tại thời điểm này, compute host đã biết được image nào sẽ được sử dụng để chạy instance. 
+- **`nova-compute`** sẽ hỏi tới **`glance-api`** để lấy url của image .
 - **`glance-api`** sẽ xác thực token và gửi lại metadata của image trong đó bao gồm cả url của nó.
 - **`nova-compute`** sẽ đưa token tới **`neutron-api`** và hỏi nó về network cho instance.
 - Sau khi xác thực token, neutron sẽ tiến hành cấu hình network.
 - **`nova-compute`** tương tác với **`cinder-api`** để gán volume vào instance.
 - **`nova-compute`** sẽ generate dữ liệu cho Hypervisor và gửi thông tin thông qua libvirt.
+
+
+
+
+## 1.4: Chọn host khi launch instance
+
+- Compute SD nova-scheduler để xác định gửi các yêu cầu tính toán
+
+VD: Đang ở vùng khả dụng được yêu cầu hay không, đủ ram, disk, có thể phục vụ yc, đáp ứng các thuộc tính,... hay không
+
+- Khi filter schedulẻ nhân được yc cho tài nguyên, nó sẽ lọc xem node nào đủ điều kiện đê phân phối 
+-  Lúc này list ra được 1 list server đủ ĐK ( tiêp tục nó sẽ dựa vào `weight` để quyết định ) node compute thích hợp
