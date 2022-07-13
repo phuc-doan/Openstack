@@ -1,8 +1,13 @@
 ## 1. Giới thiệu
-- **OpenStack Networking - Neutron** cho phép tạo và quản lí các network objects ví dụ như networks, subnets, và ports cho các services khác của **OpenStack** sử dụng. 
-- **Neutron** cũng cấp API cho phép định nghĩa các kết nối mạng và gán địa chỉ ở trong môi trường cloud. **Neutron** cũng cung cấp một API cho việc cấu hình cũng như quản lí các dịch vụ networking khác nhau từ L3 forwarding, NAT cho tới load balancing, perimeter firewalls, và virtual private networks.
-- **OpenStack** là mô hình multitenancy. Tức mỗi tenant có thể tạo riêng nhiều private network, router, firewall, loadbalancer… 
-- **Neutron** có khả năng tách biệt các tài nguyên mạng giữa các tenant bằng giải pháp ***linux namespace***. Mỗi ***network namespace*** riêng cho phép tạo các route, firewall rule, interface device riêng. Mỗi network hay router do tenant tạo ra đều hiện hữu dưới dạng 1 ***network namespace***, từ đó các tenant có thể tạo các network trùng nhau (overlapping) nhưng vẫn độc lập mà không bị xung đột (isolated)
+
+
+- Trong Openstack, Networking Service cung cấp cho người dùng API cho người dùng có thể cài đặt và định nghĩa các network. Gọi là neutron.
+
+
+- Openstack networking service làm nhiệm vụ  tạo và quản lý hạ tầng mạng ảo,  bao gồm network, switch, subnet, router
+
+
+- Openstack networking bao gồm : neutron-server, database storage, plug-in agent, cung cấp một số service khác để giao tiếp với Linux, external devices, or SDN controllers.
 
 ## 2. OPS network gồm các thành phần
 - **neutron-server** : Chấp nhận và chuyển hướng các API request đến các plugin thích hợp để xử lý.
@@ -13,7 +18,7 @@
 
 ## 3.  Các loại mô hình network trong Openstack Networking 
 
-Provider,  Routed provider networks và self-service
+- Provider,  Routed provider networks và self-service
 
 
 ### 3.1. Provider Network
@@ -45,10 +50,11 @@ Cụ thể hơn , mạng này map tới các các mạng layer 2 đã được c
 - Mong nhiều trường hợp, self-service network sử dụng overload protocol bằng VXLAN, GRE vì chúng có thể hỗ trợ nhiều mạng hơn layer-2 khi sử dụng VLAN ( 802.1q) 
 - IPv4 trong self-service thường sử dụng IP Private, tương tác với provider network bằng Source NAT sử dụng router ảo. Floating IP address cho phép truy cập instance từ provider network bằng Destination NAT sử dụng Router ảo 
 - IPv6 trong self-service sử dụng IP Public và tương tác với provider network sử dụng các static route thông qua các Router ảo
-- Trong openstack networking tích hợp một router layer-3 thường nằm ít nhất trên một node network. Trái ngược với provider network kết nối tới các instance thông qua hạ tầng mạng vật lý layer-2
-- Người dùng có thể tạo các selt-network theo từng project.  Bởi vậy các kết nối sẽ không được chia sẻ với  các project khác. 
 
-Trong Openstack hỗ trợ các kiểu cô lập và overlay sau :
+
+- User có thể tạo các selt-network theo từng project.  Bởi vậy các kết nối sẽ không được chia sẻ với  các project khác. 
+
+### Trong Openstack hỗ trợ các kiểu cô lập và overlay sau :
 - Flat : tất cả instance kết nối vào một network chung. Không được tag VLAN_ID vào packet hoặc phân chia vùng mạng 
 - VLAN :  cho phép khởi tạo nhiều provider hoặc tenant network2 sử dụng VLAN (801.2q) , tương ứng với VLAN  đang có sẵn trên mạng vật lý. Điều này cho phép instance kết nối tới các thành phần khác trong mạng
 - GRE and VXLAN : là mỗi giao thức đóng gói packet , cho phép tạo ra mạng overlay để tạo kết nối giữa các instance.  Một router ảo để kết nối từ tenant network ra external network.  Một router provider sử dụng để kết nối từ external network vào các instance trong tenant network sử dụng floating IP
