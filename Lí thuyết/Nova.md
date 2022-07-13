@@ -31,7 +31,11 @@
 
 ## 1.3 Quá trình khởi tạo 1 instance 
 
-<img src="../images/nova-quatrinhboot3.png" />
+
+
+
+![image](https://user-images.githubusercontent.com/83824403/178639606-e6886114-6dcb-4af5-81a2-2ca090da4474.png)
+
 
 <a name="2.1"></a>
 
