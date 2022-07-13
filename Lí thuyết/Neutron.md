@@ -1,20 +1,19 @@
-## **1. Giới thiệu**
-- **OpenStack Networking - Neutron** cho phép tạo và quản lí các network objects ví dụ như networks, subnets, và ports cho các services khác của **OpenStack** sử dụng. Với kiến trúc plugable, các plug-in có thể được sử dụng để triển khai các thiết bị và phần mềm khác nhau, nó khiến **OpenStack** có tính linh hoạt trong kiến trúc và triển khai.
+## 1. Giới thiệu
+- **OpenStack Networking - Neutron** cho phép tạo và quản lí các network objects ví dụ như networks, subnets, và ports cho các services khác của **OpenStack** sử dụng. 
 - **Neutron** cũng cấp API cho phép định nghĩa các kết nối mạng và gán địa chỉ ở trong môi trường cloud. **Neutron** cũng cung cấp một API cho việc cấu hình cũng như quản lí các dịch vụ networking khác nhau từ L3 forwarding, NAT cho tới load balancing, perimeter firewalls, và virtual private networks.
 - **OpenStack** là mô hình multitenancy. Tức mỗi tenant có thể tạo riêng nhiều private network, router, firewall, loadbalancer… 
 - **Neutron** có khả năng tách biệt các tài nguyên mạng giữa các tenant bằng giải pháp ***linux namespace***. Mỗi ***network namespace*** riêng cho phép tạo các route, firewall rule, interface device riêng. Mỗi network hay router do tenant tạo ra đều hiện hữu dưới dạng 1 ***network namespace***, từ đó các tenant có thể tạo các network trùng nhau (overlapping) nhưng vẫn độc lập mà không bị xung đột (isolated)
 
-## **2. OPS network gồm các thành phần**
-
+## 2. OPS network gồm các thành phần
 - **neutron-server** : Chấp nhận và chuyển hướng các API request đến các plugin thích hợp để xử lý.
 
 - **Openstack Networking plug-in và agent** : Có chức năng cắm và gỡ port, tạo mạng hoặc subnet, và cung cấp các địa chỉ IP.
 
 - **Messaging queue** : Được sử dụng để giao tiếp, truyền lệnh và trao đổi thông tin giữa neutron-server với các agent. Nó cũng hoạt động như là một database để lưu trữ trạng thái mạng cho các plug-in cụ thể.
 
-## **3  Các loại mô hình network trong Openstack Networking **
+## 3.  Các loại mô hình network trong Openstack Networking 
 
-Trong Openstack có 3 loại network gồm : provider,  Routed provider networks và self-service
+Provider,  Routed provider networks và self-service
 
 
 ### 3.1. Provider Network
