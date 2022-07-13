@@ -515,6 +515,8 @@ su -s /bin/sh -c "placement-manage db sync" placement
 #### Trên node Controller
 
 - Khởi tạo database cho nova
+
+
 ```
  mysql
 CREATE DATABASE nova_api;
@@ -555,6 +557,7 @@ openstack endpoint create --region RegionOne compute admin http://controller:877
 [DEFAULT]
 transport_url = rabbit://openstack:phucdv@controller:5672/
 my_ip = 172.16.2.129
+
 [api_database]
 connection = mysql+pymysql://nova:phucdv@controller/nova_api
 
@@ -589,7 +592,6 @@ api_servers = http://controller:9292
 lock_path = /var/lib/nova/tmp
 
 [placement]  // truy cập placement
-# ...
 region_name = RegionOne
 project_domain_name = Default
 project_name = service
@@ -657,11 +659,9 @@ server_proxyclient_address = $my_ip
 novncproxy_base_url = http://172.16.2.129:6080/vnc_auto.html
 
 [glance]  //configure the location of the Image service API
-# ...
 api_servers = http://controller:9292
 
 [oslo_concurrency]
-# ...
 lock_path = /var/lib/nova/tmp
 
 [placement]  // truy cập placement
