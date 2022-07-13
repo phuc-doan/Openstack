@@ -2,7 +2,6 @@
 ## Overview
 <a name="2.1"></a>
 
-## 2.1. Một số component tham gia vào quá trình khởi tạo và dự phòng cho máy ảo
 - CLI: Command Line Interpreter - là giao diện dòng lệnh để thực hiện các command gửi tới OpenStack Compute
 - Dashboard (Horizon): cung cấp giao diện web cho việc quản trị các dịch vụ trong OpenStack
 - Compute(Nova): quản lý vòng đời máy ảo, từ lúc khởi tạo cho tới lúc ngừng hoạt động, tiếp nhận yêu cầu tạo máy ảo từ người dùng.
