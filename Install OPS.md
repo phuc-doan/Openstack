@@ -1005,6 +1005,87 @@ service neutron-linuxbridge-agent restart
 $ openstack network create  --share --external --provider-physical-network provider --provider-network-type flat provider
   
 $ openstack subnet create --network provider --allocation-pool start=172.168.1.100,end=172.168.1.200 --dns-nameserver 8.8.8.8 --gateway 172.168.1.0 --subnet-range 172.168.0.0 provider
+```  
   
-  
-  
+#### 2.6 Cài Dashboard Horizon
+
+
+- Tải OPS- dashboard
+
+```
+apt install openstack-dashboard
+```
+- Sửa file cấu hình theo các đề mục sau
+```
+vim /etc/openstack-dashboard/local_settings.py 
+
+OPENSTACK_HOST = "controller"
+
+ALLOWED_HOSTS = ['*', '172.16.2.129']
+
+
+SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
+
+CACHES = {
+    'default': {
+         'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+         'LOCATION': '172.16.2.129:11211',
+    }
+}
+
+```
+- Những dòng khác chúng ta sẽ commnent hết lại
+-  Sau đó làm theo các bước sau
+
+
+- Enable the Identity API version 3:
+
+```
+OPENSTACK_KEYSTONE_URL = "http://%s/identity/v3" % OPENSTACK_HOST
+
+OPENSTACK_KEYSTONE_MULTIDOMAIN_SUPPORT = True
+Configure API versions:
+
+OPENSTACK_API_VERSIONS = {
+    "identity": 3,
+    "image": 2,
+    "volume": 3,
+}
+
+
+OPENSTACK_KEYSTONE_DEFAULT_DOMAIN = "Default"
+
+
+OPENSTACK_KEYSTONE_DEFAULT_ROLE = "user"
+
+
+OPENSTACK_NEUTRON_NETWORK = {
+    ...
+    'enable_router': False,
+    'enable_quotas': False,
+    'enable_ipv6': False,
+    'enable_distributed_router': False,
+    'enable_ha_router': False,
+    'enable_fip_topology_check': False,
+}
+
+
+TIME_ZONE = "TIME_ZONE"
+Replace TIME_ZONE with an appropriate time zone identifier. For more information, see the list of time zones.
+
+```
+- Sửa file như sau nếu nó chưa có sẵn
+
+```
+vim /etc/apache2/conf-available/openstack-dashboard.conf if not included.
+
+
+
+WSGIApplicationGroup %{GLOBAL}
+```
+### Cuối cùng restart lại service và vào web duyệt theo đường dẫn `172.16.2.129/Horizon/`
+```
+ systemctl reload apache2.service
+``` 
+
+**`=>> Kết quả cuối cùng như sau:`**
