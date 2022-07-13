@@ -239,3 +239,7 @@ $openstack volume snapshot create --volume volume01 snapshot01
 ```
 
 
+## References:
+- https://docs.openstack.org/ocata/user-guide/cli-cheat-sheet.html
+- https://docs.openstack.org/python-openstackclient/pike/cli/command-list.html
+
