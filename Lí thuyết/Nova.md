@@ -37,21 +37,11 @@
 ![image](https://user-images.githubusercontent.com/83824403/178639606-e6886114-6dcb-4af5-81a2-2ca090da4474.png)
 
 
-<a name="2.1"></a>
 
-## 2.1. Một số component tham gia vào quá trình khởi tạo và dự phòng cho máy ảo
-- CLI: Command Line Interpreter - là giao diện dòng lệnh để thực hiện các command gửi tới OpenStack Compute
-- Dashboard (Horizon): cung cấp giao diện web cho việc quản trị các dịch vụ trong OpenStack
-- Compute(Nova): quản lý vòng đời máy ảo, từ lúc khởi tạo cho tới lúc ngừng hoạt động, tiếp nhận yêu cầu tạo máy ảo từ người dùng.
-- Network - Quantum (hiện tại là Neutron): cung cấp kết nối mạng cho Compute, cho phép người dùng tạo ra mạng riêng của họ và kết nối các máy ảo vào mạng riêng đó.
-- Block Storage (Cinder): Cung cấp khối lưu trữ bền vững cho các máy ảo
-- Image(Glance): lưu trữ đĩa ảo trên Image Store
-- Identity(Keystone): cung cấp dịch vụ xác thưc và ủy quyền cho toàn bộ các thành phần trong OpenStack.
-- Message Queue(RabbitMQ): thực hiện việc giao tiếp giữa các component trong OpenStack như Nova, Neutron, Cinder.
 
-<a name="2.2"></a>
 
-## 2.2. Request flow trong quá trình tạo máy ảo
+
+## Các bước được thực hiện lần lượt như sau
 - Bước 1: Từ Dashboard hoặc CLI, nhập thông tin chứng thực (ví dụ: user name và password) và thực hiện lời gọi REST tới Keystone để xác thực
 - Bước 2: Keystone xác thực thông tin người dùng và tạo ra một token xác thực gửi trở lại cho người dùng, mục đích là để xác thực trong các bản tin request tới các dịch vụ khác thông qua REST
 - Bước 3: Dashboard hoặc CLI sẽ chuyển yêu cầu tạo máy ảo mới thông qua thao tác "launch instance" trên openstack dashboard hoặc "nova-boot" trên CLI, các thao tác này thực hiện REST API request và gửi yêu cầu tới nova-api
