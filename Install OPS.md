@@ -696,6 +696,7 @@ service nova-compute restart
 
 ![image](https://user-images.githubusercontent.com/83824403/178720080-1e35e4c7-fac7-4024-98f7-d9ee0424efdc.png)
 
+```
 root@controller:~# su -s /bin/sh -c "nova-manage cell_v2 discover_hosts --verbose" nova
 ```
 
@@ -703,34 +704,307 @@ root@controller:~# su -s /bin/sh -c "nova-manage cell_v2 discover_hosts --verbos
  
  
  
- #### 2.5 Cài Compute
+ #### 2.5 Cài Neutron
  
  
+ #### Trên node Controller
+
+- Khởi tạo database cho neutron
+
+```
+mysql
+CREATE DATABASE neutron;
+GRANT ALL PRIVILEGES ON neutron.* TO 'neutron'@'localhost'  IDENTIFIED BY 'phucdv';
+GRANT ALL PRIVILEGES ON neutron.* TO 'neutron'@'%' IDENTIFIED BY 'phucdv';
+exit
+```
+
+- 	Tạo thông tin xác thực dịch vụ cho neutron
+
+```
+openstack user create --domain default --password-prompt neutron
+openstack role add --project service --user neutron admin
+openstack service create --name neutron  --description "OpenStack Networking" network
+openstack endpoint create --region RegionOne network public http://controller:9696
+openstack endpoint create --region RegionOne network internal http://controller:9696
+openstack endpoint create --region RegionOne network admin http://controller:9696
+```
+
+- 	Cài đặt dịch vụ neutron
+- 	
+```
+ apt -y install neutron-server neutron-plugin-ml2 neutron-linuxbridge-agent neutron-dhcp-agent neutron-metadata-agent
+```
+
+
+
+- Cấp quyền truy cập cho admin
+
+```
+$. admin-openrc
+openstack user create --domain default --password-prompt neutron
+```
+
+- Add the admin role to the neutron user:
+```
+$ openstack role add --project service --user neutron admin
+ ```
+ 
+
+- Tạo neutron service entity:
+```
+$ openstack service create --name neutron  --description "OpenStack Networking" network
+```
+
+- Tạo API endpoint neutron service:
+
+
+```
+$ openstack endpoint create --region RegionOne network public http://controller:9696
+$ openstack endpoint create --region RegionOne network internal http://controller:9696
+$ openstack endpoint create --region RegionOne network admin http://controller:9696
+
+```
+**`Provider networks`**
+
+
+- Chỉnh sửa file cấu hình dịch vụ netron
+
+```
+vim /etc/neutron/neutron.conf
+
+[DEFAULT]
+core_plugin = ml2
+service_plugins =
+transport_url = rabbit://openstack:phucdv@controller
+auth_strategy = keystone
+notify_nova_on_port_status_changes = true
+notify_nova_on_port_data_changes = true
+
+
+[keystone_authtoken]
+www_authenticate_uri = http://controller:5000
+auth_url = http://controller:5000
+memcached_servers = controller:11211
+auth_type = password
+project_domain_name = default
+user_domain_name = default
+project_name = service
+username = neutron
+password = phucdv
+
+### NOTE: Comment out or remove any other connection options in the [database] section.
+
+[nova]
+auth_url = http://controller:5000
+auth_type = password
+project_domain_name = default
+user_domain_name = default
+region_name = RegionOne
+project_name = service
+username = nova
+password = phucdv
+
+[oslo_concurrency]
+lock_path = /var/lib/neutron/tmp
+```
+
+```sh
+
+ vim /etc/neutron/metadata_agent.ini
+
+[DEFAULT]
+nova_metadata_host =172.16.2.129
+metadata_proxy_shared_secret = phucdv
+
+```
+```sh
+ vim /etc/neutron/plugins/ml2/ml2_conf.ini
+
+[ml2]
+type_drivers = flat,vlan
+tenant_network_types =
+mechanism_drivers = linuxbridge
+extension_drivers = port_security
+
+[ml2_type_flat]
+flat_networks = provider
+
+[securitygroup]
+enable_ipset = true
+```
+
+
+- Sửa file /etc/neutron/plugins/ml2/linuxbridge_agent.ini
+
+
+```
+[linux_bridge]
+physical_interface_mappings = provider:ens37
+
+[vxlan]
+enable_vxlan = false
+
+[securitygroup]
+
+enable_security_group = true
+firewall_driver = neutron.agent.linux.iptables_firewall.IptablesFirewallDriver
+
+
+- Đảm bảo kernel Linux của hỗ trợ bộ lọc cầu nối mạng bằng cách xác minh tất cả các giá trị sysctl sau được đặt thành 1:
+
+``` 
+sysctl net.bridge.bridge-nf-call-iptables
+sysctl net.bridge.bridge-nf-call-ip6tables
+
+```
+
+- Cấu hình DHCP agent
+```
+vim /etc/neutron/dhcp_agent.ini
+
+[DEFAULT]
+
+interface_driver = linuxbridge
+dhcp_driver = neutron.agent.linux.dhcp.Dnsmasq
+enable_isolated_metadata = true
+```
+
+
+- Cấu hình metadata agent
+```
+ vim /etc/neutron/metadata_agent.ini
+
+
+
+[DEFAULT]
+
+nova_metadata_host = controller
+metadata_proxy_shared_secret = METADATA_SECRET
+```
+
+
+- Định cấu hình compute để sử dụng dịch vụ Mạng 
+```
+vim /etc/nova/nova.conf
+
+[neutron]
+
+auth_url = http://controller:5000
+auth_type = password
+project_domain_name = default
+user_domain_name = default
+region_name = RegionOne
+project_name = service
+username = neutron
+password = NEUTRON_PASS
+service_metadata_proxy = true
+metadata_proxy_shared_secret = phucdv
+
+
+
+
+
+
+- Populate the database:
+
+```
+su -s /bin/sh -c "neutron-db-manage --config-file /etc/neutron/neutron.conf  --config-file /etc/neutron/plugins/ml2/ml2_conf.ini upgrade head" neutron
+```
+
+Database population occurs later for Networking because the script requires complete server and plug-in configuration files.
+
+- Restart the Compute API service:
+
+```
+ service nova-api restart
+```
  
  
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
+ - Restart networking service
+
+
+```
+ service neutron-server restart
+ service neutron-linuxbridge-agent restart
+ service neutron-dhcp-agent restart
+ service neutron-metadata-agent restart
+
+
+HOẶC CHẠY: service neutron* restart
+```
+
+
+
+#### Trên node network
+
+- 	Cài đặt dịch vụ neutron
+```
+apt install neutron-linuxbridge-agent
+```
+
+- Chỉnh sửa file cấu hình dịch vụ netron
+
+```
+vim /etc/neutron/neutron.conf
+
+[DEFAULT]
+auth_strategy = keystone
+transport_url = rabbit://openstack:phucdv@172.16.2.129
+
+[keystone_authtoken]
+www_authenticate_uri = http://controller:5000
+auth_url = http://controller:5000
+memcached_servers = controller:11211
+auth_type = password
+project_domain_name = default
+user_domain_name = default
+project_name = service
+username = neutron
+password = phucdv
+
+[oslo_concurrency]
+lock_path = /var/lib/neutron/tmp
+```
+
+- Cấu hình compute service để có thể SD network service
+
+```
+vim /etc/nova/nova.conf 
+
+
+[neutron]
+# ...
+auth_url = http://controller:5000
+auth_type = password
+project_domain_name = default
+user_domain_name = default
+region_name = RegionOne
+project_name = service
+username = neutron
+password = phucdv
+
+```
+
+- Cuối cùng, restart lại các service liên quan
+
+
+```
+service nova-compute restart
+
+service neutron-linuxbridge-agent restart
+```
+
+
+#### Tạo mạng với provider network
+
+
+```
+. admin-openrc
+
+$ openstack network create  --share --external --provider-physical-network provider --provider-network-type flat provider
+  
+$ openstack subnet create --network provider --allocation-pool start=172.168.1.100,end=172.168.1.200 --dns-nameserver 8.8.8.8 --gateway 172.168.1.0 --subnet-range 172.168.0.0 provider
+  
+  
+  
