@@ -126,7 +126,14 @@ $ ping -I br0 10.0.0.1
 ![image](https://user-images.githubusercontent.com/83824403/178889201-17f15caa-f9c3-48c6-9453-46005fbd538a.png)
 
 
-### 2.2 Sử dụng Wireshark bắt gói tin ICMP và phân tích:
+### 2.2 Sử dụng Wireshark hoặc TCP dump bắt gói tin ICMP và phân tích:
+
+#### TCP Dump 
+
+![image](https://user-images.githubusercontent.com/83824403/178889333-06c49e94-90cf-47be-bde0-42f29daff91a.png)
+
+
+#### Wireshark
 
 - Setup wireshark chạy dưới dạng root user để bắt gói tin dễ dàng hơn:
     ```
