@@ -76,9 +76,12 @@ $ sudo ovs-vsctl add-port sw1 ens33
 > ping `10.0.0.20`
 #### Result 
 
-![Screenshot_12.png](https://github.com/dobuithanhnam/Viettel-Digital-Talent-2021/blob/main/Week3/pic/Screenshot_12.png)
+![image](https://user-images.githubusercontent.com/83824403/178887758-ca88cf16-8165-4c00-9a08-f9a401562e60.png)
 
-### Step 5: Use Wireshark to capture traffic between 2 virtual machines
+### Step 5: Use Wireshark to capture traffic between 2 virtual machines or TCP dump
+
+![image](https://user-images.githubusercontent.com/83824403/178887846-73de2ad2-7ee0-45a9-8fcb-3d0acd3c9a3d.png)
+
 
 #### Result 
 
