@@ -84,9 +84,10 @@ $ sudo ovs-vsctl add-port sw1 ens33
 
 
 
-#### Result 
+### Result 
 
-![Screenshot_14.png](https://github.com/dobuithanhnam/Viettel-Digital-Talent-2021/blob/main/Week3/pic/Screenshot_14.png)
+![image](https://user-images.githubusercontent.com/83824403/178888540-d928f470-ea2f-4d66-b4c4-2b584233a6e6.png)
+
 
 ## Advantages and Disadvantages of using Vxlan network in datacenter
 
