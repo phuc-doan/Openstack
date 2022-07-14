@@ -116,14 +116,14 @@ Cấu hình VXLAN tunnel cho vswitch br0 trên host 1:
 ```
 $ ping -I br0 10.0.0.2
 ```
-![image](https://user-images.githubusercontent.com/83824403/178888999-a3174a1a-2883-4a75-bc70-a31a3bb27f52.png)
+- VÀ LÀM TƯƠNG TỰ 
 
 
 - Ping từ VM2 => VM1:
 ```
 $ ping -I br0 10.0.0.1
 ```
-![image](https://user-images.githubusercontent.com/83824403/178889020-42e30526-a9f6-4f65-9eaa-fd80404cd35c.png)
+![image](https://user-images.githubusercontent.com/83824403/178889201-17f15caa-f9c3-48c6-9453-46005fbd538a.png)
 
 
 ### 2.2 Sử dụng Wireshark bắt gói tin ICMP và phân tích:
