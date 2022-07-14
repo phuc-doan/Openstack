@@ -696,7 +696,7 @@ su -s /bin/sh -c "nova-manage cell_v2 discover_hosts --verbose" nova
  
  
  
- #### 2.5 Cài Neutron
+ ### 2.5 Cài Neutron
  
  
  #### Trên node Controller
@@ -1003,7 +1003,7 @@ openstack network create  --share --external --provider-physical-network provide
 openstack subnet create --network provider --allocation-pool start=192.168.1.100,end=192.168.1.200 --dns-nameserver 8.8.8.8 --gateway 172.168.1.0 --subnet-range 192.168.0.0 provider
 ```  
   
-#### 2.6 Cài Dashboard Horizon
+### 2.6 Cài Dashboard Horizon
 
 
 - Tải OPS- dashboard
@@ -1095,7 +1095,7 @@ WSGIApplicationGroup %{GLOBAL}
 
 
 
-- Ngoài ra có thể tạo mạng self-service, nhìn chung nó như sau:
+- **Ngoài ra có thể tạo mạng self-service, nhìn chung nó như sau:**
 
 ![image](https://user-images.githubusercontent.com/83824403/178882097-faee749b-6c24-4d13-a7ec-817f9a2d50cf.png)
 
