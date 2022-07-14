@@ -1,10 +1,10 @@
-## Cách cài đặt OPS yoga trên Ubuntu 20.04
+# Cách cài đặt OPS yoga trên Ubuntu 20.04
 
 - Mô hình cơ bản 
 
 ![image](https://user-images.githubusercontent.com/83824403/178680453-e58aa11f-bb1d-4983-adde-2f5f9f4885b7.png)
 
-### 1.  Node controller cùng làm các thao tác sau
+## 1.  Node controller cùng làm các thao tác sau
 -  sửa file /etc/hosts như sau:
 
 172.16.2.129 controller
@@ -25,11 +25,11 @@
  apt install python3-openstackclient -y
  ```
  
- ### 2. Node controller
+ ## 2. Node controller
  
- #### 2.1 Cài DB, Message queue, Memcached, ETCD
+ ### 2.1 Cài DB, Message queue, Memcached, ETCD
  
- ##### 2.1.1 Cài DB
+ #### 2.1.1 Cài DB
  ```
  apt install mariadb-server python3-pymysql -y
  ```
@@ -54,7 +54,7 @@ character-set-server = utf8
 ```
 service mysql restart
 ```
- ##### 2.1.2 Cài Message queue
+ #### 2.1.2 Cài Message queue
  
 - Tải gói 
 
@@ -62,7 +62,8 @@ service mysql restart
 apt install rabbitmq-server
 ```
 - Thêm OPS user
-- 
+
+
 ```
 rabbitmqctl add_user openstack phucdv
 
@@ -79,7 +80,7 @@ rabbitmqctl set_permissions openstack ".*" ".*" ".*"
 Setting permissions for user "openstack" in vhost "/" ...
 
 ```
-##### 2.1.3 Memcached
+#### 2.1.3 Memcached
 
 - Cài Memcached
 ```
@@ -100,12 +101,12 @@ Change the existing line that had -l 127.0.0.1.
 ```
 service memcached restart
 ```
-##### 2.1.4 ETCD
+#### 2.1.4 ETCD
 
 - Cài etcd
 
 ```
-apt install etcd
+apt install etcd -y
 ```
 
 
@@ -128,14 +129,14 @@ ETCD_LISTEN_CLIENT_URLS="http://172.16.2.129:2379"
 - enable và restart lại service
 
 ```
-# systemctl enable etcd
-# systemctl restart etcd
+systemctl enable etcd
+systemctl restart etcd
 ```
 
 
 
 
- #### 2.2 Cài Keystone
+ ### 2.2 Cài Keystone
 
 - Tạo Keystone DB 
 
@@ -155,18 +156,16 @@ IDENTIFIED BY 'phucdv';
 
 - Tải Keystone xuống
 ```
-# apt install keystone
+apt install keystone -y
 ```
 - Sửa file /etc/keystone/keystone.conf 
 
 ```
 
 [database]
-# ...
 connection = mysql+pymysql://keystone:phucdv@controller/keystone
 
 [token]
-# ...
 provider = fernet
 Populate the Identity service database:
 
@@ -183,14 +182,14 @@ Populate the Identity service database:
 - Khởi tạo khóa fernet
 
 ```
-# keystone-manage fernet_setup --keystone-user keystone --keystone-group keystone
-# keystone-manage credential_setup --keystone-user keystone --keystone-group keystone
+keystone-manage fernet_setup --keystone-user keystone --keystone-group keystone
+keystone-manage credential_setup --keystone-user keystone --keystone-group keystone
 
 ```
 
 - Bootstrap dịch vụ Identity:
 ```
-# keystone-manage bootstrap --bootstrap-password phucdv \
+keystone-manage bootstrap --bootstrap-password phucdv \
   --bootstrap-admin-url http://controller:5000/v3/ \
   --bootstrap-internal-url http://controller:5000/v3/ \
   --bootstrap-public-url http://controller:5000/v3/ \
@@ -204,7 +203,7 @@ ServerName controller
 - Restart httpd
 ```
 
-# service apache2 restart
+ service apache2 restart
 ```
 
 - Tạo script chứa thông tin đăng nhập vào dịch vụ identity
@@ -338,7 +337,7 @@ $ openstack token issue
  
  
  
- #### 2.3 Cài Glance
+ ### 2.3 Cài Glance
  
 
 - Khởi tạo database cho glance
@@ -354,34 +353,31 @@ exit
 - 	Tạo thông tin xác thực dịch vụ cho glance
 
 ```sh
-$ openstack user create --domain default --password-prompt glance
-$ openstack role add --project service --user glance admin
-$ openstack service create --name glance \
->   --description "OpenStack Image" image
-$ openstack endpoint create --region RegionOne \
->   image public http://controller:9292
-$ openstack endpoint create --region RegionOne \
->   image internal http://controller:9292
-$ openstack endpoint create --region RegionOne \
->   image admin http://controller:9292
+openstack user create --domain default --password-prompt glance
+openstack role add --project service --user glance admin
+openstack service create --name glance --description "OpenStack Image" image
+openstack endpoint create --region RegionOne image public http://controller:9292
+openstack endpoint create --region RegionOne image internal http://controller:9292
+openstack endpoint create --region RegionOne image admin http://controller:9292
 ```
 
 
 - Ví dụ như sau
-- 
--   ![image](https://user-images.githubusercontent.com/83824403/178691331-9cf0fb44-e7d0-44e2-992d-ab34f93e7e08.png)
+
+ ![image](https://user-images.githubusercontent.com/83824403/178691331-9cf0fb44-e7d0-44e2-992d-ab34f93e7e08.png)
 
 
 
 - 	Cài đặt dịch vụ glance
-```sh
-root@controller:~# apt install glance -y
+```
+ apt install glance -y
 ```
 
 - Chỉnh sửa file cấu hình dịch vụ glance
 
-```sh
-root@controller:~# vim /etc/glance/glance-api.conf
+```
+vim /etc/glance/glance-api.conf
+
 
 [database]  //truy cập CSDL
 connection = mysql+pymysql://glance:phucdv@controller/glance
@@ -409,24 +405,24 @@ filesystem_store_datadir = /var/lib/glance/images/
 
 - Populate vào CSDL dịch vụ glance
 
-```sh
-root@controller:~# su -s /bin/sh -c "glance-manage db_sync" glance
+```
+su -s /bin/sh -c "glance-manage db_sync" glance
 ```
 
 - Khởi động lại dịch vụ
 
-```sh
-root@controller:~# service glance-api restart
+```
+service glance-api restart
 ```
 
 -	Tải image và upload lên dịch vụ glance
 ```
-# wget http://download.cirros-cloud.net/0.4.0/cirros-0.4.0-x86_64-disk.img
-# glance image-create --name "cirros" \
+wget http://download.cirros-cloud.net/0.4.0/cirros-0.4.0-x86_64-disk.img
+glance image-create --name "cirros" \
 >   --file cirros-0.4.0-x86_64-disk.img \
 >   --disk-format qcow2 --container-format bare \
 >   --visibility=public
-$ openstack image list
+openstack image list
 ```
 
 - Kết quả sẽ như sau
@@ -438,7 +434,7 @@ $ openstack image list
 ### Cài đặt dịch vụ Placement
 #### Trên node controller
 - Khởi tạo database cho placement
-```sh
+```
 # mysql
 CREATE DATABASE placement;
 GRANT ALL PRIVILEGES ON placement.* TO 'placement'@'localhost'  IDENTIFIED BY 'phucdv';
@@ -449,25 +445,25 @@ exit
 - 	Tạo thông tin xác thực dịch vụ cho placement
 
 ```sh
-# openstack user create --domain default --password-prompt placement
-# openstack role add --project service --user placement admin
-# openstack service create --name placement placement
-# openstack endpoint create --region RegionOne \
+openstack user create --domain default --password-prompt placement
+openstack role add --project service --user placement admin
+openstack service create --name placement placement
+openstack endpoint create --region RegionOne \
 >   placement public http://controller:8778
-# openstack endpoint create --region RegionOne \
+openstack endpoint create --region RegionOne \
 >   placement internal http://controller:8778
-# openstack endpoint create --region RegionOne \
+openstack endpoint create --region RegionOne \
 >   placement admin http://controller:8778
 ```
 
 - 	Cài đặt dịch vụ placement
-```sh
+```
 apt install placement-api -y 
 ```
 
 - Chỉnh sửa file cấu hình dịch vụ placement
 
-```sh
+```
  vim  /etc/placement/placement.conf
 
 [placement_database] //truy cập CSDL
@@ -490,14 +486,14 @@ password = phucdv
 
 - Populate vào CSDL placement
 
-```sh
+```
 su -s /bin/sh -c "placement-manage db sync" placement
 ```
 
 - Khởi động lại dịch vụ
 
 ```sh
-# service apache2 restart
+service apache2 restart
 ```
 
  
@@ -509,7 +505,7 @@ su -s /bin/sh -c "placement-manage db sync" placement
  
  
  
- #### 2.4 Cài Nova
+ ### 2.4 Cài Nova
  
 
 #### Trên node Controller
@@ -544,14 +540,14 @@ openstack endpoint create --region RegionOne compute admin http://controller:877
 ```
 
 - 	Cài đặt dịch vụ nova
-```sh
+```
  apt install nova-api nova-conductor nova-novncproxy nova-scheduler -y
 ```
 
 - Chỉnh sửa file cấu hình dịch vụ nova
 
 ```
-# vim /etc/nova/nova.conf
+vim /etc/nova/nova.conf
 
 
 [DEFAULT]
@@ -579,16 +575,13 @@ password = phucdv
 
 [vnc]
 enabled = true
-# ...
 server_listen = $my_ip
 server_proxyclient_address = $my_ip
 
 [glance]  //configure the location of the Image service API
-# ...
 api_servers = http://controller:9292
 
 [oslo_concurrency]
-# ...
 lock_path = /var/lib/nova/tmp
 
 [placement]  // truy cập placement
@@ -605,16 +598,16 @@ password = phucdv
 
 - Populate vào CSDL nova-api, nova và đăng ký database cell0 và cell1
 
-```sh
-# su -s /bin/sh -c "nova-manage api_db sync" nova
-# su -s /bin/sh -c "nova-manage cell_v2 map_cell0" nova
-# su -s /bin/sh -c "nova-manage cell_v2 create_cell --name=cell1 --verbose" nova
-# su -s /bin/sh -c "nova-manage db sync" nova
+```
+su -s /bin/sh -c "nova-manage api_db sync" nova
+su -s /bin/sh -c "nova-manage cell_v2 map_cell0" nova
+su -s /bin/sh -c "nova-manage cell_v2 create_cell --name=cell1 --verbose" nova
+su -s /bin/sh -c "nova-manage db sync" nova
 ```
 
 - Khởi động lại dịch vụ
 
-```sh
+```
 service nova-api restart
 service nova-scheduler restart
 service nova-conductor restart
@@ -625,13 +618,13 @@ service nova-novncproxy restart
 #### Trên node compute
 
 - 	Cài đặt dịch vụ nova-compute
-```sh
-root@compute:~# apt install nova-compute
+```
+apt -y install nova-compute
 ```
 
 - Chỉnh sửa file cấu hình dịch vụ nova
 
-```sh
+```
 vim /etc/nova/nova.conf
 
 
@@ -665,7 +658,6 @@ api_servers = http://controller:9292
 lock_path = /var/lib/nova/tmp
 
 [placement]  // truy cập placement
-# ...
 region_name = RegionOne
 project_domain_name = Default
 project_name = service
@@ -678,8 +670,8 @@ password = phucdv
 
 - Cấu hình nova-compute
 
-```sh
-root@compute:~# vim /etc/nova/nova-compute.conf
+```
+vim /etc/nova/nova-compute.conf
 
 [libvirt]
 virt_type = qemu
@@ -688,7 +680,7 @@ virt_type = qemu
 
 - Khởi động lại dịch vụ
 
-```sh
+```
 service nova-compute restart
 ```
 
@@ -697,7 +689,7 @@ service nova-compute restart
 ![image](https://user-images.githubusercontent.com/83824403/178720080-1e35e4c7-fac7-4024-98f7-d9ee0424efdc.png)
 
 ```
-root@controller:~# su -s /bin/sh -c "nova-manage cell_v2 discover_hosts --verbose" nova
+su -s /bin/sh -c "nova-manage cell_v2 discover_hosts --verbose" nova
 ```
 
 
@@ -747,19 +739,19 @@ openstack endpoint create --region RegionOne network admin http://controller:969
 - Cấp quyền truy cập cho admin
 
 ```
-$. admin-openrc
+. admin-openrc
 openstack user create --domain default --password-prompt neutron
 ```
 
 - Add the admin role to the neutron user:
 ```
-$ openstack role add --project service --user neutron admin
+ openstack role add --project service --user neutron admin
  ```
  
 
 - Tạo neutron service entity:
 ```
-$ openstack service create --name neutron  --description "OpenStack Networking" network
+openstack service create --name neutron  --description "OpenStack Networking" network
 ```
 
 
@@ -807,7 +799,7 @@ password = phucdv
 lock_path = /var/lib/neutron/tmp
 ```
 
-```sh
+```
 
  vim /etc/neutron/metadata_agent.ini
 
@@ -816,7 +808,7 @@ nova_metadata_host =172.16.2.129
 metadata_proxy_shared_secret = phucdv
 
 ```
-```sh
+```
  vim /etc/neutron/plugins/ml2/ml2_conf.ini
 
 [ml2]
@@ -858,6 +850,8 @@ sysctl net.bridge.bridge-nf-call-ip6tables
 ```
 
 - Cấu hình DHCP agent
+
+
 ```
 vim /etc/neutron/dhcp_agent.ini
 
@@ -870,6 +864,8 @@ enable_isolated_metadata = true
 
 
 - Cấu hình metadata agent
+
+
 ```
  vim /etc/neutron/metadata_agent.ini
 
@@ -883,6 +879,8 @@ metadata_proxy_shared_secret = phucdv
 
 
 - Định cấu hình compute để sử dụng dịch vụ Mạng 
+
+
 ```
 vim /etc/nova/nova.conf
 
@@ -910,7 +908,7 @@ metadata_proxy_shared_secret = phucdv
 su -s /bin/sh -c "neutron-db-manage --config-file /etc/neutron/neutron.conf  --config-file /etc/neutron/plugins/ml2/ml2_conf.ini upgrade head" neutron
 ```
 
-Database population occurs later for Networking because the script requires complete server and plug-in configuration files.
+*`NOTE: Database population occurs later for Networking because the script requires complete server and plug-in configuration files.`*
 
 - Restart the Compute API service:
 
@@ -938,7 +936,7 @@ HOẶC CHẠY: service neutron* restart
 
 - 	Cài đặt dịch vụ neutron
 ```
-apt install neutron-linuxbridge-agent
+apt install neutron-linuxbridge-agent -y
 ```
 
 - Chỉnh sửa file cấu hình dịch vụ netron
@@ -972,7 +970,6 @@ vim /etc/nova/nova.conf
 
 
 [neutron]
-# ...
 auth_url = http://controller:5000
 auth_type = password
 project_domain_name = default
@@ -991,6 +988,7 @@ password = phucdv
 service nova-compute restart
 
 service neutron-linuxbridge-agent restart
+
 ```
 
 
@@ -1000,9 +998,9 @@ service neutron-linuxbridge-agent restart
 ```
 . admin-openrc
 
-$ openstack network create  --share --external --provider-physical-network provider --provider-network-type flat provider
+openstack network create  --share --external --provider-physical-network provider --provider-network-type flat provider
   
-$ openstack subnet create --network provider --allocation-pool start=192.168.1.100,end=192.168.1.200 --dns-nameserver 8.8.8.8 --gateway 172.168.1.0 --subnet-range 192.168.0.0 provider
+openstack subnet create --network provider --allocation-pool start=192.168.1.100,end=192.168.1.200 --dns-nameserver 8.8.8.8 --gateway 172.168.1.0 --subnet-range 192.168.0.0 provider
 ```  
   
 #### 2.6 Cài Dashboard Horizon
@@ -1011,7 +1009,7 @@ $ openstack subnet create --network provider --allocation-pool start=192.168.1.1
 - Tải OPS- dashboard
 
 ```
-apt install openstack-dashboard
+apt install openstack-dashboard -y
 ```
 - Sửa file cấu hình theo các đề mục sau
 ```
