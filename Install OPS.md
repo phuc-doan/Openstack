@@ -1,11 +1,11 @@
 # Cách cài đặt OPS yoga trên Ubuntu 20.04
 
-- Mô hình cơ bản 
+- **Mô hình cơ bản**
 
 ![image](https://user-images.githubusercontent.com/83824403/178680453-e58aa11f-bb1d-4983-adde-2f5f9f4885b7.png)
 
-## 1.  Node controller cùng làm các thao tác sau
--  sửa file /etc/hosts như sau:
+## 1.  Node controller và compute cùng làm các thao tác sau
+-  sửa file `/etc/hosts` như sau:
 
 172.16.2.129 controller
 172.16.2.130 compute1
@@ -34,7 +34,7 @@
  apt install mariadb-server python3-pymysql -y
  ```
  
- - Tạo & Sửa file /etc/mysql/mariadb.conf.d/99-openstack.cnf như sau
+ - Tạo & Sửa file `/etc/mysql/mariadb.conf.d/99-openstack.cnf` như sau
 
 
 ```
@@ -87,7 +87,7 @@ Setting permissions for user "openstack" in vhost "/" ...
  apt install memcached python3-memcache
 ```
 
-- Sửa file /etc/memcached.conf 
+- Sửa file `/etc/memcached.conf` 
 ```
 -l 172.16.2.129
 
@@ -112,7 +112,7 @@ apt install etcd -y
 
 
 
-- Sửa file /etc/default/etcd như sau
+- Sửa file `/etc/default/etcd` như sau
 ```
 
 ETCD_NAME="controller"
@@ -158,7 +158,7 @@ IDENTIFIED BY 'phucdv';
 ```
 apt install keystone -y
 ```
-- Sửa file /etc/keystone/keystone.conf 
+- Sửa file `/etc/keystone/keystone.conf` 
 
 ```
 
@@ -195,7 +195,7 @@ keystone-manage bootstrap --bootstrap-password phucdv \
   --bootstrap-public-url http://controller:5000/v3/ \
   --bootstrap-region-id RegionOne
 ```
-- Sửa file httpd.conf
+- Sửa file `httpd.conf` và thêm dòng
 ```
 ServerName controller
 ```
@@ -227,7 +227,7 @@ export OS_IMAGE_API_VERSION=2
 Mặc dù miền "mặc định" đã tồn tại từ bước khởi động keystone-quản lý trong hướng dẫn này, một cách chính thức để tạo một miền mới sẽ là:
 
 ```
-$ openstack domain create --description "An Example Domain" example
+openstack domain create --description "An Example Domain" example
 ```
  
  ![image](https://user-images.githubusercontent.com/83824403/178687875-2be15179-6c14-41ad-9710-8f28c93e4419.png)
@@ -236,7 +236,7 @@ $ openstack domain create --description "An Example Domain" example
 - Tạo service project
 
 ```
-$ openstack project create --domain default \
+openstack project create --domain default \
   --description "Service Project" service
 ```
 
@@ -245,7 +245,7 @@ $ openstack project create --domain default \
 Tạo dự án myproject:
 
 ```
-$ openstack project create --domain default \
+openstack project create --domain default \
   --description "Demo Project" myproject
 ```
 
@@ -261,14 +261,14 @@ $ openstack project create --domain default \
 
 ```
 
-$ openstack role create myrole
+openstack role create myrole
 ```
 
 - Thêm vai trò myrole vào dự án myproject và người dùng myuser:
 
 
 ```
-$ openstack role add --project myproject --user myuser myrole
+openstack role add --project myproject --user myuser myrole
 
 ```
 
@@ -286,7 +286,7 @@ $ openstack role add --project myproject --user myuser myrole
 Bỏ đặt biến môi trường OS_AUTH_URL và OS_PASSWORD tạm thời:
 ```
 
-$ unset OS_AUTH_URL OS_PASSWORD
+unset OS_AUTH_URL OS_PASSWORD
 ```
 
 - Request authen token
