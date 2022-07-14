@@ -80,7 +80,8 @@ $ sudo ovs-vsctl add-port sw1 ens33
 
 ### Step 5: Use Wireshark to capture traffic between 2 virtual machines or TCP dump
 
-![image](https://user-images.githubusercontent.com/83824403/178887846-73de2ad2-7ee0-45a9-8fcb-3d0acd3c9a3d.png)
+![image](https://user-images.githubusercontent.com/83824403/178888321-5ac95b47-d003-4685-a12c-cfd439eef299.png)
+
 
 
 #### Result 
