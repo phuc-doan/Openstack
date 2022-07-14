@@ -1,4 +1,4 @@
-# WEEK 3: SDN-NFV
+
 
 ## Practice: Setup VXLAN network between 2 VMs and test
 
