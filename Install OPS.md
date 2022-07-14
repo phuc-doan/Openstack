@@ -636,7 +636,7 @@ vim /etc/nova/nova.conf
 
 
 [DEFAULT]
-transport_url = rabbit://openstack:lean15998@controller:5672/
+transport_url = rabbit://openstack:phucdv@controller:5672/
 my_ip = 172.16.2.130
 
 [api]
@@ -877,8 +877,8 @@ enable_isolated_metadata = true
 
 [DEFAULT]
 
-nova_metadata_host = controller
-metadata_proxy_shared_secret = METADATA_SECRET
+nova_metadata_host = 172.16.2.129
+metadata_proxy_shared_secret = phucdv
 ```
 
 
@@ -895,7 +895,7 @@ user_domain_name = default
 region_name = RegionOne
 project_name = service
 username = neutron
-password = NEUTRON_PASS
+password = phucdv
 service_metadata_proxy = true
 metadata_proxy_shared_secret = phucdv
 ```
@@ -1002,7 +1002,7 @@ service neutron-linuxbridge-agent restart
 
 $ openstack network create  --share --external --provider-physical-network provider --provider-network-type flat provider
   
-$ openstack subnet create --network provider --allocation-pool start=172.168.1.100,end=172.168.1.200 --dns-nameserver 8.8.8.8 --gateway 172.168.1.0 --subnet-range 172.168.0.0 provider
+$ openstack subnet create --network provider --allocation-pool start=192.168.1.100,end=192.168.1.200 --dns-nameserver 8.8.8.8 --gateway 172.168.1.0 --subnet-range 192.168.0.0 provider
 ```  
   
 #### 2.6 Cài Dashboard Horizon
@@ -1081,9 +1081,24 @@ vim /etc/apache2/conf-available/openstack-dashboard.conf if not included.
 
 WSGIApplicationGroup %{GLOBAL}
 ```
-### Cuối cùng restart lại service và vào web duyệt theo đường dẫn `172.16.2.129/Horizon/`
+
 ```
  systemctl reload apache2.service
 ``` 
+### Cuối cùng restart lại service và vào web duyệt theo đường dẫn `172.16.2.129/Horizon/`
 
+
+- Tạo instance ...
+ 
 **`=>> Kết quả cuối cùng như sau:`**
+
+![image](https://user-images.githubusercontent.com/83824403/178881294-956caad6-d742-42b5-bf64-9c7a5d0765bf.png)
+
+
+
+
+- Ngoài ra có thể tạo mạng self-service, nhìn chung nó như sau:
+
+![image](https://user-images.githubusercontent.com/83824403/178882097-faee749b-6c24-4d13-a7ec-817f9a2d50cf.png)
+
+
