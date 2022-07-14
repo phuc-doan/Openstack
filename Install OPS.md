@@ -730,8 +730,14 @@ openstack endpoint create --region RegionOne network internal http://controller:
 openstack endpoint create --region RegionOne network admin http://controller:9696
 ```
 
+
+
+![image](https://user-images.githubusercontent.com/83824403/178871051-396824b6-a3e4-4ca1-b314-62d183d78d77.png)
+
+
+
 - 	Cài đặt dịch vụ neutron
-- 	
+
 ```
  apt -y install neutron-server neutron-plugin-ml2 neutron-linuxbridge-agent neutron-dhcp-agent neutron-metadata-agent
 ```
@@ -756,15 +762,7 @@ $ openstack role add --project service --user neutron admin
 $ openstack service create --name neutron  --description "OpenStack Networking" network
 ```
 
-- Tạo API endpoint neutron service:
 
-
-```
-$ openstack endpoint create --region RegionOne network public http://controller:9696
-$ openstack endpoint create --region RegionOne network internal http://controller:9696
-$ openstack endpoint create --region RegionOne network admin http://controller:9696
-
-```
 **`Provider networks`**
 
 
@@ -849,7 +847,7 @@ enable_vxlan = false
 
 enable_security_group = true
 firewall_driver = neutron.agent.linux.iptables_firewall.IptablesFirewallDriver
-
+```
 
 - Đảm bảo kernel Linux của hỗ trợ bộ lọc cầu nối mạng bằng cách xác minh tất cả các giá trị sysctl sau được đặt thành 1:
 
@@ -900,7 +898,7 @@ username = neutron
 password = NEUTRON_PASS
 service_metadata_proxy = true
 metadata_proxy_shared_secret = phucdv
-
+```
 
 
 
@@ -936,7 +934,7 @@ HOẶC CHẠY: service neutron* restart
 
 
 
-#### Trên node network
+#### Trên node compute
 
 - 	Cài đặt dịch vụ neutron
 ```
@@ -996,7 +994,7 @@ service neutron-linuxbridge-agent restart
 ```
 
 
-#### Tạo mạng với provider network
+#### Tạo mạng với provider network ở controller
 
 
 ```
