@@ -9,7 +9,8 @@
     - vswitch br0: 10.0.0.2
     - vswitch br1: 192.168.159.132
   
-![diagram](images/lab/vxlandiagram.png)
+![image](https://user-images.githubusercontent.com/83824403/178888905-cfd98e9c-6629-41c4-a5a1-b28f759084ed.png)
+
 
 - Mô tả:
 
@@ -41,7 +42,8 @@
   ```
   $ systemctl status ovs-vswitchd
   ```
-![](images/lab/statusovs.png)
+![image](https://user-images.githubusercontent.com/83824403/178888956-88ae7f5c-0f2f-469f-bfed-9e895f273634.png)
+
  
 - Tạo 2 vswitch br0 và br1 trên cả 2 host:
  
@@ -114,13 +116,15 @@ Cấu hình VXLAN tunnel cho vswitch br0 trên host 1:
 ```
 $ ping -I br0 10.0.0.2
 ```
-![](images/lab/pingresult.png)
+![image](https://user-images.githubusercontent.com/83824403/178888999-a3174a1a-2883-4a75-bc70-a31a3bb27f52.png)
+
 
 - Ping từ VM2 => VM1:
 ```
 $ ping -I br0 10.0.0.1
 ```
-![](images/lab/pingresult2.png)
+![image](https://user-images.githubusercontent.com/83824403/178889020-42e30526-a9f6-4f65-9eaa-fd80404cd35c.png)
+
 
 ### 2.2 Sử dụng Wireshark bắt gói tin ICMP và phân tích:
 
@@ -131,12 +135,12 @@ $ ping -I br0 10.0.0.1
 - Trên VM1 mở Wireshark và chọn Interface dump là **br1**.
 - Từ VM2 thực hiện **ping** tới br0 của VM1.
 - Trên wireshark ở VM1 sẽ bắt được các gói tin như sau:
+![image](https://user-images.githubusercontent.com/83824403/178889034-218063d0-ce8d-4139-9e70-425d31b17240.png)
 
-![](images/lab/wireshark1.png)
 
 - Phân tích gói tin:
+![image](https://user-images.githubusercontent.com/83824403/178889046-a4249b2e-7de0-4e9b-ad4f-992aa8c92a3c.png)
 
-![](images/lab/icmpdetail.png)
 
 - Ta có thể đối chiếu với VXLAN frame format tại [đây](https://github.com/hocchudong/thuctap012017/blob/master/TamNT/Virtualization/docs/4.Tim_hieu_VXLAN.md#1.3.3).
 
