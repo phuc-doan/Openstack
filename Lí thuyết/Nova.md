@@ -99,7 +99,7 @@
 
 ![image](https://user-images.githubusercontent.com/83824403/179200493-c77fe510-7509-4ab3-a49e-b0ecd35cdbf8.png)
 
-- Sau khi filter schedule đã list ra được tiêp theo đến trọng số **`weight`** quyết định, việc khai báo `weight` nằm ở file **`nova.conf`**. Mỗi compute sẽ chỉnh phần này khác nhau:
+- Sau khi filter schedule đã list ra được tiêp theo đến trọng số **`weight`** quyết định, việc khai báo `weight` nằm ở file **`nova.conf`**. Mỗi node compute sẽ chỉnh phần này khác nhau:
 
 
 ##### ví dụ:
