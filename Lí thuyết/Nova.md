@@ -82,7 +82,7 @@
 
 - Compute sử dụng **`nova-scheduler`** service để xác định request được gửi tới node compute nào
 
-VD: Đang ở vùng khả dụng được yêu cầu hay không, đủ ram, disk, có thể phục vụ yc, đáp ứng các thuộc tính,... hay không
+*`VD: Đang ở vùng khả dụng được yêu cầu hay không, đủ ram, disk, có thể phục vụ yc, đáp ứng các thuộc tính,... hay không`*
 
 - Khi filter schedulẻ nhân được yc cho tài nguyên, nó sẽ lọc xem node nào đủ điều kiện đê phân phối
 
