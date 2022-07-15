@@ -80,7 +80,7 @@
 
 ## 4: Chọn host khi launch instance
 
-- Compute sử dụng nova-scheduler service để xác định request được gửi tới node compute nào
+- Compute sử dụng **`nova-scheduler`** service để xác định request được gửi tới node compute nào
 
 VD: Đang ở vùng khả dụng được yêu cầu hay không, đủ ram, disk, có thể phục vụ yc, đáp ứng các thuộc tính,... hay không
 
@@ -89,7 +89,7 @@ VD: Đang ở vùng khả dụng được yêu cầu hay không, đủ ram, disk
 
 ![image](https://user-images.githubusercontent.com/83824403/179202645-ef1a54fa-2087-4d6d-b323-5096ee097be6.png)
 
-- Hoặc có thể tự customize filler này, tự viết bằng python:
+- Hoặc có thể tự customize filler này, **`tự viết bằng python:`**
 
 
 ![image](https://user-images.githubusercontent.com/83824403/179202932-9326e282-d849-41c7-8904-607d07df9624.png)
@@ -99,13 +99,13 @@ VD: Đang ở vùng khả dụng được yêu cầu hay không, đủ ram, disk
 
 ![image](https://user-images.githubusercontent.com/83824403/179200493-c77fe510-7509-4ab3-a49e-b0ecd35cdbf8.png)
 
-- Sau khi filter schedule đã list ra được tiêp theo đến trọng số `weight` quyết định, việc khai báo `weight` nằm ở file `nova.conf`. Mỗi compute sẽ chỉnh phần này khác nhau:
+- Sau khi filter schedule đã list ra được tiêp theo đến trọng số **`weight`** quyết định, việc khai báo `weight` nằm ở file **`nova.conf`**. Mỗi compute sẽ chỉnh phần này khác nhau:
 
 
 ##### ví dụ:
 
 ![image](https://user-images.githubusercontent.com/83824403/179200939-afbbbe83-8bbc-4e75-ab0f-02b938aa9905.png)
 
-- Diagram theo docs OPS:
+- *`Diagram theo docs OPS:`*
 
 ![image](https://user-images.githubusercontent.com/83824403/179201186-b8f45e8d-19a5-4810-8a36-29ba02eef30c.png)
