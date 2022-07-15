@@ -18,15 +18,8 @@
 - **`nova-scheduler`** : lấy các yêu cầu máy ảo đặt vào queue và xác định xem chúng được chạy trên compute server host nào.
 - **`nova-novncproxy`** : cung cấp VNC proxy thông qua browser, cho phép VNC console để truy cập máy ảo .
 - **`nova-volume`**: quản lý vòng đời các ổ dĩa ảo của các instance
-- **`DB`**: lưu trạng thái build-time và run-time của cloud infra gồm:
+- **`DB`**: lưu trạng thái build-time và run-time của cloud gồm ( Available instance types, Instances in use, Available networks Projects)
 
-+) Các loại VM có sẵn
-
-+) instance đang SD
-
-+) Netwok có sẵn
-
-+) Project
 
 
 ## 1.3 Quá trình khởi tạo 1 instance 
