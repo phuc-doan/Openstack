@@ -1,13 +1,13 @@
-#### [1. Giới thiệu NOVA](#1)
+#### [1. Giới thiệu nova](#1)
 
-#### [2. Các thành phần NOVA](#2)
+#### [2. Các thành phần nova](#2)
 
-#### [3. Qúa trình khởi tạo 1 instance](#3)
+#### [3. Qúa trình khởi tạo 1 Instance](#3)
 
-#### [4. Chọn host nào khi lauch instace](#4)
+#### [4. Chọn host nào khi lauch Instace](#4)
 
 
-## 1 Tổng quan nova
+## 1. Tổng quan nova
 
 - **Nova** service chịu trách nhiệm quản lí các hệ thống cloud. **OpenStack Nova** là một project core trong OpenStack, mục đích cấp phép các tài nguyên và quản lý máy ảo.
 - **Nova - OpenStack Compute Service** chính là phần chính quan trọng nhất trong kiến trúc hệ thống (IaaS). 
@@ -18,7 +18,7 @@
     - Horizon để lấy giao diện cho người dùng và người quản trị.
     - Ngoài ra còn có thể tương tác với các service khác : block storage, disk, baremetal compute instance
 - Nova không chứa các phần mềm ảo hóa. mà nó định nghĩa các drivers để tương tác với các kĩ thuật ảo hóa khác chạy trên os của user và cung cấp các chức năng thông qua một web-based API.
-## 2 Các thành phần của Nova
+## 2. Các thành phần của Nova
 
 - **`nova-identify service`**: giao tiếp với keystone để xác thực request
 - **`nova-api`** : nhận các yc http sau đó chuyển đổi thành lệnh, thực hiện giao tiếp các thành phần khác nhau qua hàng đợi oslo
@@ -31,7 +31,7 @@
 
 
 
-## 3 Quá trình khởi tạo 1 instance 
+## 3. Quá trình khởi tạo 1 instance 
 
 
 
@@ -78,7 +78,7 @@
 
 
 
-## 4: Chọn host khi launch instance
+## 4. Chọn host khi launch instance
 
 - Compute sử dụng **`nova-scheduler`** service để xác định request được gửi tới node compute nào
 
