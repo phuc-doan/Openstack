@@ -1,8 +1,8 @@
 ## 1.1 Tổng quan nova
 
-- **Nova** là service chịu trách nhiệm chứa và quản lí các hệ thống cloud computing. **OpenStack Nova** là một project core trong OpenStack, nhằm mục đích cấp phép các tài nguyên và quản lý số lượng lớn máy ảo.
+- **Nova** là service chịu trách nhiệm chứa và quản lí các hệ thống cloud computing. **OpenStack Nova** là một project core trong OpenStack, nhằm mục đích cấp phép các tài nguyên và quản lý máy ảo.
 - **Nova - OpenStack Compute Service** chính là phần chính quan trọng nhất trong kiến trúc hệ thống **Infrastructure-as-a-Service (IaaS)**. 
-- Phần lớn các modules của Nova được viết bằng **Python**.
+- Các modules của Nova được viết bằng **Python**.
 - **OpenStack Compute** giao tiếp với các service khác của OpenStack :
     - **OpenStack Identity (Keystone)** để xác thực
     - **OpenStack Image (Glance)** để lấy images
@@ -78,7 +78,7 @@
 
 ## 1.4: Chọn host khi launch instance
 
-- Compute SD nova-scheduler để xác định gửi các yêu cầu tính toán
+- Compute sử dụng nova-scheduler service để xác định request được gửi tới node compute nào
 
 VD: Đang ở vùng khả dụng được yêu cầu hay không, đủ ram, disk, có thể phục vụ yc, đáp ứng các thuộc tính,... hay không
 
