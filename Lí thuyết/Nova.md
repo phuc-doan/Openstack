@@ -1,6 +1,6 @@
 ## 1.1 Tổng quan nova
 
-- **Nova** là service chịu trách nhiệm chứa và quản lí các hệ thống cloud computing. **OpenStack Nova** là một project core trong OpenStack, nhằm mục đích cấp phép các tài nguyên và quản lý máy ảo.
+- **Nova** service chịu trách nhiệm quản lí các hệ thống cloud. **OpenStack Nova** là một project core trong OpenStack, mục đích cấp phép các tài nguyên và quản lý máy ảo.
 - **Nova - OpenStack Compute Service** chính là phần chính quan trọng nhất trong kiến trúc hệ thống **Infrastructure-as-a-Service (IaaS)**. 
 - Các modules của Nova được viết bằng **Python**.
 - **OpenStack Compute** giao tiếp với các service khác của OpenStack :
@@ -8,9 +8,9 @@
     - **OpenStack Image (Glance)** để lấy images
     - **OpenStack Dashboard (Horizon)** để lấy giao diện cho người dùng và người quản trị.
     - Ngoài ra còn có thể tương tác với các service khác : block storage, disk, baremetal compute instance
-- Nova cho phép điều khiển các máy ảo và cũng có thể quản lí các truy cập tới cloud từ users và projects. 
-- Nova không chứa các phần mềm ảo hóa. Thay vào đó, nó sẽ định nghĩa các drivers để tương tác với các kĩ thuật ảo hóa khác chạy trên hệ điều hành của người dùng và cung cấp các chức năng thông qua một web-based API.
+- Nova không chứa các phần mềm ảo hóa. mà nó định nghĩa các drivers để tương tác với các kĩ thuật ảo hóa khác chạy trên os của user và cung cấp các chức năng thông qua một web-based API.
 ## 1.2 Các thành phần của Nova
+
 - **`nova-identify service`**: giao tiếp với keystone để xác thực request
 - **`nova-api`** : nhận các yc http sau đó chuyển đổi thành lệnh, thực hiện giao tiếp các thành phần khác nhau qua hàng đợi oslo
 - **`nova-compute`** : quản lý vm, khởi tạo máy ảo, gửi state vm vào db .
@@ -77,3 +77,16 @@ VD: Đang ở vùng khả dụng được yêu cầu hay không, đủ ram, disk
 
 - Khi filter schedulẻ nhân được yc cho tài nguyên, nó sẽ lọc xem node nào đủ điều kiện đê phân phối 
 -  Lúc này list ra được 1 list server đủ ĐK ( tiêp tục nó sẽ dựa vào `weight` để quyết định ) node compute thích hợp
+
+![image](https://user-images.githubusercontent.com/83824403/179200493-c77fe510-7509-4ab3-a49e-b0ecd35cdbf8.png)
+
+- Sau khi filter schedule đã list ra được tiêp theo đến trọng số `weight` quyết định, việc khai báo `weight` nằm ở file `nova.conf`. Mỗi compute sẽ chỉnh phần này khác nhau:
+
+
+##### ví dụ:
+
+![image](https://user-images.githubusercontent.com/83824403/179200939-afbbbe83-8bbc-4e75-ab0f-02b938aa9905.png)
+
+- Diagram theo docs OPS:
+
+![image](https://user-images.githubusercontent.com/83824403/179201186-b8f45e8d-19a5-4810-8a36-29ba02eef30c.png)
