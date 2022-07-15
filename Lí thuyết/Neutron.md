@@ -27,36 +27,141 @@
 
 
 
-Provider network cung cấp kết nối mạng layer 2 cho máy ảo với tùy chọn dịch vụ DHCP và metadata. Mạng này kết nối đến mạng layer 2 đã tồn tại ở datacenter, thường dùng Vlan để định danh và chia mạng.
+- Trong mô hình mạng Provider trên có hai node với các YC:
+  - Controller node: 
+    - Có hai network interface: management và provider.
+    - Cài đặt Openstack Networking server và Ml2 Plugin.
+  - Compute node:
+    - Có hai network interface: management và provider. 
+    - Cài đặt Linux bridge agent, DHCP agent, metadata agent, và các phụ thuộc khác.
 
-Provider network đơn giản. Chỉ có Admin user mới có quyền chỉnh sửa Provider network vì nó yêu cầu cấu hình hạ tầng mạng vật lý.
+![](https://i.imgur.com/UGowcLN.png)
 
-Vì L2 nên không hỗ trợ các tính năng như router hay floating ip.
-
+- Các thành phần trong Openstack networking sẽ sử dụng mạng management để giao tiếp với nhau. Trong khi đó, mạng provider được sử dụng để cung cấp mạng cho máy ảo thông quan Linux Bridge agent và đồng thời cung cấp mạng cho DHCP và metadata agent để cung cấp DHCP và Metadata cho máy ảo.
 
 
 ### 3.2. Routed Network 
 
-Routed provider networks cung cấp kết nối ở layer 3 cho các máy ảo. Các network này map với những networks layer 3 đã tồn tại.
 
-Cụ thể hơn , mạng này map tới các các mạng layer 2 đã được chỉ định làm provider network . Mỗi router có một gateway để làm nhiệm vụ định tuyến . . Routed provider networks tất nhiên sẽ có hiệu suất thấp hơn so với provider networks.
 
 ### 3.3. Self-service network
+### Ví dụ về mô hình mạng Self-service sử dụng 
 
-![image](https://user-images.githubusercontent.com/83824403/178648137-f8c9ebda-5a64-4886-bfe0-943180640784.png)
+- Kiến trúc mạng sefl service:
+
+![](https://imgur.com/4WceQla.png)
+
+- Ví dụ dưới đây hiển thị các thành phần và kết nối giữa một mạng self-service và một mạng provider với router đứng ở giữa để thực hiện SNAT.
+
+![](https://i.imgur.com/s08dciE.png)
 
 
-- Self-service network cho phép các project quản lý các mạng mà không cần quyền admin. Những mạng này hoàn toàn là mạng ảo và yêu cầu một mạng ảo ,sau đó tương tác với provider network và mạng ngoài ( internet ). Self-service thường sử dụng DHCP và meta cho các instance
-- Mong nhiều trường hợp, self-service network sử dụng overload protocol bằng VXLAN, GRE vì chúng có thể hỗ trợ nhiều mạng hơn layer-2 khi sử dụng VLAN ( 802.1q) 
-- IPv4 trong self-service thường sử dụng IP Private, tương tác với provider network bằng Source NAT sử dụng router ảo. Floating IP address cho phép truy cập instance từ provider network bằng Destination NAT sử dụng Router ảo 
-- IPv6 trong self-service sử dụng IP Public và tương tác với provider network sử dụng các static route thông qua các Router ảo
+### Luồng đi của lưu lượng mạng.
+Với mô hình mạng self-service, chúng ta cũng mô tả luồng đi của lưu lượng mạng theo một số kịch bản phổ biến như North-south và East-west.
+Lưu lượng mạng North-south di chuyển giữa máy ảo và mạng bên ngoài như là internet.
+Lưu lượng mạng East-west di chuyển giữa các máy ảo trong cùng hoặc khác mạng với nhau. 
+Ở tất cả các kịch bản, hạ tầng mạng vật lý phụ trách switching và routing giữa mạng provider với mạng ngoài như Internet.
 
 
-- User có thể tạo các selt-network theo từng project.  Bởi vậy các kết nối sẽ không được chia sẻ với  các project khác. 
+#### Kịch bản North-south 1: máy ảo với địa chỉ ip được fix cứng.
 
-### Trong Openstack hỗ trợ các kiểu cô lập và overlay sau :
-- Flat : tất cả instance kết nối vào một network chung. Không được tag VLAN_ID vào packet hoặc phân chia vùng mạng 
-- VLAN :  cho phép khởi tạo nhiều provider hoặc tenant network2 sử dụng VLAN (801.2q) , tương ứng với VLAN  đang có sẵn trên mạng vật lý. Điều này cho phép instance kết nối tới các thành phần khác trong mạng
-- GRE and VXLAN : là mỗi giao thức đóng gói packet , cho phép tạo ra mạng overlay để tạo kết nối giữa các instance.  Một router ảo để kết nối từ tenant network ra external network.  Một router provider sử dụng để kết nối từ external network vào các instance trong tenant network sử dụng floating IP
+Kịch bản này, máy ảo sẽ gửi gói tin từ mạng self-service 1: 
 
-<img src="https://github.com/lean15998/Openstack/blob/main/images/07.01.png">
+![](https://i.imgur.com/q3wlcuB.png)
+
+Các bước thực hiện trên compute node:
+1. Interface của máy ảo(1) gửi gói tin đến  port của máy ảo(2) trên provider bridge thông qua **veth pair**
+2. Security group rule(3) sẽ xử lý firewall và theo dõi kết nối 
+3. Self-service bridge chuyển gói tin đến VXLAN interface(4) để đóng gói gói tin sử dụng VNI 101.
+4. Interface vật lý(5) được dùng bởi VXLAN interface chuyển tiếp gói tin mà đã được đóng gói qua mạng overlay(6).
+
+Các bước sau thực hiện trên Network node:
+1. Interface vật lý(7) được dùng bởi VXLAN interface trên network node chuyển tiếp gói tin đến VXLAN interface(8) để gỡ lớp đóng gói VNI.
+2. Port của router trên self-service bridge(9) chuyển tiếp gói tin đến interface mạng self-service(10) trên Router namespace. 
+  - Đối với địa chỉ IPv4, router sẽ thực hiện SNAT trên gói tin, nó sẽ thay đổi địa chỉ IP nguồn của gói tin thành địa chỉ IP của router trên mạng provider, và gửi nó đến *gateway IP* của mạng Provider thông qua *gateway interface* của router(11).
+  - Đối với địa chỉ IPv6, router sẽ gửi gói tin đến địa chỉ IP next-hop, thường là địa chỉ gateway của mạng provider.
+3. Router chuyển tiếp gói tin đến port trên provider bridge(12).
+4. Port VLAN sub-interface(13) trên provider bridge chuyển tiếp gói tin đến interface vật lý của mạng provider(14).
+5. Interface vật lý(14) gán VLAN tag cho gói tin và chuyển tiếp gói tin ra hạ tầng mạng vật lý(15).
+
+> Luồng đi của gói tin trả về giống với các bước trên nhưng ngược lại. Tuy nhiên, không có địa chỉ floating IPv4, máy chủ ở mạng provider hoặc external network không thể khởi tạo kết nối đến máy ảo ở trong mạng self-service.
+
+#### Kịch bản North-south 2: Máy ảo có địa chỉ floating IPv4.
+
+Với máy ảo có địa chỉ Floating IP, network node sẽ thực hiện SNAT với lưu lượng north-south gửi từ máy ảo ra mạng provider và thực hiện DNAT với lưu lượng north-south gửi từ mạng provider vào máy ảo. Với IPv6 thì không cần phải có Floating Ip và NAT vì trong cả hai trường hợp trên thì network node định tuyến IPv6. Còn muốn biết thêm tại sao thì tìm hiểu thêm về IPv6 đi :))).
+
+Với luồng đi của gói tin từ máy ảo đi ra thì giống với kịch bản đầu tiên nhưng thay vì thay vì sửa Ip nguồn của gói tin thành địa chỉ Ip provider của router thì SNAT sẽ thay địa chỉ IP nguồn thành Floating IP.
+
+Ở đây chúng ta thực hiện kịch bản máy ở mạng provider gửi gói tin đến máy ảo trong mạng self-service.
+
+![](https://i.imgur.com/nfMLBHc.png)
+
+Trên network node :
+1. Từ mạng vật lý (1) gửi packet vào provider physical interface(2) trên network node.  
+2. Interface vật lý mạng provider(3) sẽ bỏ các VLAN_TAG và sẽ gửi các packet vào VLAN Sub_interface tương ứng  trên provider bridge(4). 
+3. Provider bridge sẽ chuyển packet sang self-service router gateway port (5) 
+  - Với IPv4, router đảm nhiệm thực hiện DNAT để thay đổi địa chỉ đích IP thành  địa chỉ IP của instance trên mạng self-service.(6) 
+4. Router chuyển gói tin đến tin đến port của router trên self-service bridge(7)
+5. Self-service bridge gửi packet đến VXLAN Interface kèm theo đóng gói gói tin vói VNI(8)
+6. Interface vật lý(9) dùng cho VXLAN  gửi packet đến compute node thông qua Overlay network ( 10 )
+
+Trên compute node:
+1. Physical interface (11) dùng cho VXLAN trên compute node nhận gói tin và gửi đến VXLAN interface ở self-server bridge (12) 
+2. Security group đảm nhiệm filter packet (13)
+3. Port của máy ảo trên self-service bridge(14) chuyển packet đến port của máy ảo(15) thông qua **veth pair**.
+ 
+#### Kịch bản East-west 1: Cùng mạng.
+Các máy ảo với địa chỉ IPv4/IPv6 cứng hoặc floating IPv4 trên cùng mạng sẽ giao tiếp trực tiếp giữa các compute node chứa máy ảo. 
+
+Giao thức VXLAN mặc định thiếu thông tin về vị trí đích và dùng multicast để khám phá nó. Sau khi khám phá được, nó lưu vị trí đích trong database nội bộ. Tuy nhiên, với hệ thống lớn, quá trình khám phá này có thể gây ra lưu lượng mạng lớn trên hệ thống mà tất cả các node cần xử lý. Để tăng tính hiệu quả, dịch vụ Openstack Networking sử dụng layer-2 population mechanism driver để tự động quảng bá database cho các VXLAN interface.
+
+Thực hiện kịch bản hai hai máy ảo cùng một mạng self-service, và trên hai compute node khác nhau. 
+
+![](https://i.imgur.com/DaLh5eC.png)
+
+Trên Compute 1:
+1. Interface của máy ảo(1) chuyển packet đến port của máy ảo trên self-service bridge(2)
+2. Security group (3) xử lý vấn đề liên quan đến tường lửa và theo dõi kết nối. 
+3. Self-service bridge chuyển tiếp packet tới VXLAN interface để đóng gói gói tin với VNI.
+4. Interface vật lý dùng cho VXLAN(5) trên Compute node 1 chuyển tiếp packet tới compute 2 nhờ overlay network ( 6 ) 
+
+Trên Compute 2 :
+1. Trên interface vật lý xử dụng cho VXLAN(7) trên compute node 2 nhận và chuyển tiếp gói tin đến tới VXLAN interface(8) trên self-service bridge. 
+2. Security group ( 9 ) xử lý vấn đề liên quan đến tường lửa và theo dõi kết nối cho gói tin.
+3. Port của máy ảo trên self-service bridge(10) chuyển tiếp gói tin đến máy ảo đích(11) thông qua **veth pair**.
+
+
+### 2.3 East-west - trên hai VXLAN khác nhau.
+
+Thực hiện kịch bản với hai máy ảo ở hai mạng self-service khác nhau nhưng cùng một compute node.
+
+Các máy ảo ở hai mạng self-service khác nhau muốn giao tiếp với nhau thì cần có trên một router giống nhau.
+
+![](https://i.imgur.com/9fXsZxd.png)
+
+Các bước thực hiện trên compute node:
+1. Interface của máy ảo(1) gửi gói tin đến  port của máy ảo(2) trên provider bridge thông qua **veth pair**
+2. Security group rule(3) sẽ xử lý firewall và theo dõi kết nối 
+3. Self-service bridge chuyển gói tin đến VXLAN interface(4) để đóng gói gói tin sử dụng VNI 101.
+4. Interface vật lý(5) được dùng bởi VXLAN interface chuyển tiếp gói tin mà đã được đóng gói qua mạng overlay(6).
+
+Các bước sau thực hiện trên Network node:
+1. Interface vật lý(7) được dùng bởi VXLAN interface trên network node chuyển tiếp gói tin đến VXLAN interface(8) để gỡ lớp đóng gói VNI 101.
+2. Port của router trên self-service bridge(9) chuyển tiếp gói tin đến interface mạng self-service 1(10) trên Router namespace.
+3. Router gửi gói tin đến địa chỉ IP next hop, thường là địa chỉ IP gateway của mạng self-service 2 thông qua interface self-service 2 trên router(11).
+4. Router chuyển tiếp gói tin đến port trên self-service 2 bridge(12).
+5. Self-service 2 bridge nhận và chuyển tiếp gói tin đến VXLAN interface(13) để đóng  gói gói tin với VNI 102.
+6. Interface vật lý(14) dùng cho VXLAN  gửi packet đến compute node thông qua Overlay network ( 15 )
+
+Trên compute node:
+1. Physical interface (16) dùng cho VXLAN trên compute node nhận gói tin và gửi đến VXLAN interface ở self-server bridge (17) và gỡ đóng gói VNO 102.
+2. Security group đảm nhiệm filter packet (18)
+3. Port của máy ảo trên self-service bridge(19) chuyển packet đến port của máy ảo(20) thông qua **veth pair**.
+
+
+
+
+
+## Tài liệu tham khảo.
+https://docs.openstack.org/neutron/train/admin/deploy-lb-provider.html
+https://docs.openstack.org/neutron/train/admin/deploy-lb-selfservice.html
