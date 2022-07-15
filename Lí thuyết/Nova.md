@@ -1,15 +1,24 @@
-## 1.1 Tổng quan nova
+#### [1. Giới thiệu NOVA](#1)
+
+#### [2. Các thành phần NOVA](#2)
+
+#### [3. Qúa trình khởi tạo 1 instance](#3)
+
+#### [4. Chọn host nào khi lauch instace](#4)
+
+
+## 1 Tổng quan nova
 
 - **Nova** service chịu trách nhiệm quản lí các hệ thống cloud. **OpenStack Nova** là một project core trong OpenStack, mục đích cấp phép các tài nguyên và quản lý máy ảo.
-- **Nova - OpenStack Compute Service** chính là phần chính quan trọng nhất trong kiến trúc hệ thống **Infrastructure-as-a-Service (IaaS)**. 
+- **Nova - OpenStack Compute Service** chính là phần chính quan trọng nhất trong kiến trúc hệ thống (IaaS). 
 - Các modules của Nova được viết bằng **Python**.
 - **OpenStack Compute** giao tiếp với các service khác của OpenStack :
-    - **OpenStack Identity (Keystone)** để xác thực
-    - **OpenStack Image (Glance)** để lấy images
-    - **OpenStack Dashboard (Horizon)** để lấy giao diện cho người dùng và người quản trị.
+    - Keystone để xác thực
+    - Glance để lấy images
+    - Horizon để lấy giao diện cho người dùng và người quản trị.
     - Ngoài ra còn có thể tương tác với các service khác : block storage, disk, baremetal compute instance
 - Nova không chứa các phần mềm ảo hóa. mà nó định nghĩa các drivers để tương tác với các kĩ thuật ảo hóa khác chạy trên os của user và cung cấp các chức năng thông qua một web-based API.
-## 1.2 Các thành phần của Nova
+## 2 Các thành phần của Nova
 
 - **`nova-identify service`**: giao tiếp với keystone để xác thực request
 - **`nova-api`** : nhận các yc http sau đó chuyển đổi thành lệnh, thực hiện giao tiếp các thành phần khác nhau qua hàng đợi oslo
@@ -22,7 +31,7 @@
 
 
 
-## 1.3 Quá trình khởi tạo 1 instance 
+## 3 Quá trình khởi tạo 1 instance 
 
 
 
@@ -69,13 +78,23 @@
 
 
 
-## 1.4: Chọn host khi launch instance
+## 4: Chọn host khi launch instance
 
 - Compute sử dụng nova-scheduler service để xác định request được gửi tới node compute nào
 
 VD: Đang ở vùng khả dụng được yêu cầu hay không, đủ ram, disk, có thể phục vụ yc, đáp ứng các thuộc tính,... hay không
 
-- Khi filter schedulẻ nhân được yc cho tài nguyên, nó sẽ lọc xem node nào đủ điều kiện đê phân phối 
+- Khi filter schedulẻ nhân được yc cho tài nguyên, nó sẽ lọc xem node nào đủ điều kiện đê phân phối
+
+
+![image](https://user-images.githubusercontent.com/83824403/179202645-ef1a54fa-2087-4d6d-b323-5096ee097be6.png)
+
+- Hoặc có thể tự customize filler này, tự viết bằng python:
+
+
+![image](https://user-images.githubusercontent.com/83824403/179202932-9326e282-d849-41c7-8904-607d07df9624.png)
+
+
 -  Lúc này list ra được 1 list server đủ ĐK ( tiêp tục nó sẽ dựa vào `weight` để quyết định ) node compute thích hợp
 
 ![image](https://user-images.githubusercontent.com/83824403/179200493-c77fe510-7509-4ab3-a49e-b0ecd35cdbf8.png)
