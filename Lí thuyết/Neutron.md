@@ -1,10 +1,10 @@
 ## 1. Giới thiệu
 
 
-- Trong Openstack, Networking Service cung cấp cho người dùng API cho người dùng có thể cài đặt và định nghĩa các network. Gọi là neutron.
+- Trong Openstack, Networking Service cung cấp cho người dùng API có thể cài đặt và định nghĩa các network. Gọi là neutron.
 
 
-- Openstack networking service làm nhiệm vụ  tạo và quản lý hạ tầng mạng ảo,  bao gồm network, switch, subnet, router
+- Openstack networking service làm nhiệm vụ tạo và quản lý hạ tầng mạng ảo, bao gồm network, switch, subnet, router
 
 
 - Openstack networking bao gồm : neutron-server, database storage, plug-in agent, cung cấp một số service khác để giao tiếp với Linux, external devices, or SDN controllers.
