@@ -18,16 +18,13 @@
 
 ## 3.  Các loại mô hình network trong Openstack Networking 
 
-- Provider,  Routed provider networks và self-service
+# Tìm hiểu network traffig flow của Neutron khi sử dụng Linux Bridge.
 
+Linux bridge mechanism driver chỉ sử dụng Linux bridge và **veth** để kết nối. Một layer 2 quản lý Linux bridge trên mỗi compute node và node bất kỳ nào khác mà cung cấp Layer3 (routing),  DHCP, Metadata, hoặc các dịch vụ mạng khác.
 
-### 3.1. Provider Network
-
-![image](https://user-images.githubusercontent.com/83824403/178648181-abfbb4b2-09fd-4f24-91f9-9610beead2ab.png)
-
-
-
-- Trong mô hình mạng Provider trên có hai node với các YC:
+## 1. Trong mô hình mạng Provider.
+### Một số ví dụ về mô hình mạng Provider sử dụng Linux bridge
+- Trong mô hình mạng Provider dưới đây có hai node với yêu cầu như sau:
   - Controller node: 
     - Có hai network interface: management và provider.
     - Cài đặt Openstack Networking server và Ml2 Plugin.
@@ -40,14 +37,76 @@
 - Các thành phần trong Openstack networking sẽ sử dụng mạng management để giao tiếp với nhau. Trong khi đó, mạng provider được sử dụng để cung cấp mạng cho máy ảo thông quan Linux Bridge agent và đồng thời cung cấp mạng cho DHCP và metadata agent để cung cấp DHCP và Metadata cho máy ảo.
 
 
-### 3.2. Routed Network 
+- Mô hình dưới đây mô tả kết nối trên một compute node với mạng untagged(flat). Thường thì DHCP agent và Metadata agent sẽ nằm trên compute node.
+
+![](https://i.imgur.com/8A0giSh.png)
+
+- Mô hình dưới đây mô tả kết nối giữa các thành phần của Neutron trên Compute node với 2 mạng được tag vlan.
+
+![](https://i.imgur.com/5A5t2xj.png)
+
+### Luồng đi của lưu lượng trong mạng
+
+Phần sau sẽ mô tả luồng đi của lưu lượng mạng trong hai kịch bản phổ biến là North-south và East-west. 
+Lưu lượng mạng North-south di chuyển giữa máy ảo và mạng bên ngoài như là internet.
+Lưu lượng mạng East-west di chuyển giữa các máy ảo trong cùng hoặc khác mạng với nhau. 
+Ở tất cả các kịch bản, hạ tầng mạng vật lý phụ trách switching và routing giữa mạng provider với mạng ngoài như Internet.
+
+
+#### Kịch bản North-south: Máy ảo với địa chỉ IP cố định.
+
+
+![](https://i.imgur.com/cPqRZx0.png)
+
+Các bước sau mô tả luồng đi của gói tin được gửi từ máy ảo ra Internet:
+1. Interface trên máy ảo(1) chuyển gói tin đến port của instance trên bridge(2) thông qua *veth pair*.
+2. Security group rules(3) trên Provider bridge xử lý tường lửa và theo dõi kết nối cho gói tin.
+3. VLAN sub-interface(4) trên provider bridge chuyển tiếp gói tin đến interface vật lý(5).
+4. Interface mạng vật lý(5) thêm VLAN tag cho gói tin và gửi nó đi đến switch ở hạ tầng mạng vật lý(6)
+5. Switch nhận gói tin, gỡ bỏ vlan tag và chuyển tiếp đến router(7)
+6. Router định tuyến gói tin từ mạng provider(8) đến mạng ngoài(9).
+7. Mạng ngoài nhận gói tin.
+
+#### Kịch bản East-west 1: Giữa các máy ảo trong cùng mạng.
+
+![](https://i.imgur.com/D7XNhdB.png)
+
+Các bước sau mô tả luồng đi của gói tin được gửi từ một máy ảo đến máy ảo khác trong cùng provider network nhưng trên hai compute node khác nhau:
+1. Interface của máy ảo(1) gửi gói tin đến  port của máy ảo(2) trên provider bridge thông qua **veth pair**
+2. Security group rule(3) sẽ xử lý firewall và theo dõi kết nối 
+3. Vlan Sub-interface port(4) chuyển tiếp gói tin đến interface vật lý(5) của compute node mà kết nối đến mạng provider.
+4. Interface vật lý(5) thêm vlan tag và chuyển tiếp gói tin đến provider switch(6) trong hạ tâng mạng vật lý.
+5. Switch chuyển tiếp gói tin từ compute node 1 đến compute node 2.
+6. Interface mạng vật lý của compute 2(8) gỡ vlan tag trên gói tin và chuyển tiế nó đến vlan sub-interface port(9) trên provider bridge.
+7. Security group rule(10) trên provider bridge xử lý tường lửa và theo dõi kết nối cho gói tin.
+8. port của máy ảo trên provider bridge(11) nhận và chuyển tiếp gói tin đến interface của máy ảo(12) thông qua *veth pair* .
 
 
 
-### 3.3. Self-service network
+
+#### Kịch bản East-West 2: Hai máy ảo khác mạng.
+
+Trong kịch bản này sẽ giải thích các bước trong luồng đi của gói tin gửi từ hai máy ảo trong cùng một compute node nhưng khác Vlan(VLAN 101 và VLAN 102).
+
+![](https://i.imgur.com/JGd73P3.png)
+
+Các bước:
+1. Interface của máy ảo 1(1) chuyển tiếp gói tin đến port của máy ảo(2) trên Provider bridge thông qua **veth pair**.
+2. Security group rules(3) trên Provider bridge xử lý tường lửa và theo dõi kết nối cho gói tin.
+3. VLAN sub-interface(4) trên provider bridge chuyển tiếp gói tin đến interface vật lý(5).
+4. Interface vật lý(5) thêm vlan 101 tag và chuyển tiếp gói tin đến provider switch(6) trong hạ tâng mạng vật lý.
+5. Switch  gỡ vlan 101 tag trên gói tin và chuyển cho router(7).
+6. Router định tuyến gói tin từ mạng provider 1(8) đến mạng provider 2(9).
+7. Router chuyển hướng gói tin đến switch(10).
+8. Switch gắn vlan 102 tag cho gói tin và chuyển gói tin đến compute 1(11).
+9. Interface vật lý trên compute 1 (12) gỡ vlan 102 tag và chuyển cho Vlan sub-interface port trên provider bridge của mạng provider 2.
+10. Security group rule(14) trên provider bridge xử lý tường lửa và theo dõi kết nối cho gói tin.
+11. Port của máy ảo trên provider bridge(15) nhận và chuyển tiếp gói tin đến interface của máy ảo 2 (16) thông qua *veth pair* .
+
+
+## Trong mô hình mạng Self-service
 ### Ví dụ về mô hình mạng Self-service sử dụng 
-
-- Kiến trúc mạng sefl service:
+- Ví dụ về kiến trúc mạng sefl service:
 
 ![](https://imgur.com/4WceQla.png)
 
@@ -57,7 +116,7 @@
 
 
 ### Luồng đi của lưu lượng mạng.
-Với mô hình mạng self-service, chúng ta cũng mô tả luồng đi của lưu lượng mạng theo một số kịch bản phổ biến như North-south và East-west.
+Với mô hình mạng self-service, chúng ta cũng sẽ mô tả luồng đi của lưu lượng mạng theo một số kịch bản phổ biến như North-south và East-west.
 Lưu lượng mạng North-south di chuyển giữa máy ảo và mạng bên ngoài như là internet.
 Lưu lượng mạng East-west di chuyển giữa các máy ảo trong cùng hoặc khác mạng với nhau. 
 Ở tất cả các kịch bản, hạ tầng mạng vật lý phụ trách switching và routing giữa mạng provider với mạng ngoài như Internet.
@@ -157,6 +216,14 @@ Trên compute node:
 1. Physical interface (16) dùng cho VXLAN trên compute node nhận gói tin và gửi đến VXLAN interface ở self-server bridge (17) và gỡ đóng gói VNO 102.
 2. Security group đảm nhiệm filter packet (18)
 3. Port của máy ảo trên self-service bridge(19) chuyển packet đến port của máy ảo(20) thông qua **veth pair**.
+
+
+
+
+
+## Tài liệu tham khảo.
+https://docs.openstack.org/neutron/train/admin/deploy-lb-provider.html
+https://docs.openstack.org/neutron/train/admin/deploy-lb-selfservice.html
 
 
 
