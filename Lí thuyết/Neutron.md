@@ -18,11 +18,11 @@
 
 ## 3.  Các loại mô hình network trong Openstack Networking 
 
-# Tìm hiểu network traffig flow của Neutron khi sử dụng Linux Bridge.
+## Tìm hiểu network traffig flow của Neutron khi sử dụng Linux Bridge.
 
 Linux bridge mechanism driver chỉ sử dụng Linux bridge và **veth** để kết nối. Một layer 2 quản lý Linux bridge trên mỗi compute node và node bất kỳ nào khác mà cung cấp Layer3 (routing),  DHCP, Metadata, hoặc các dịch vụ mạng khác.
 
-## 1. Trong mô hình mạng Provider.
+## 3.1. Trong mô hình mạng Provider.
 ### Một số ví dụ về mô hình mạng Provider sử dụng Linux bridge
 - Trong mô hình mạng Provider dưới đây có hai node với yêu cầu như sau:
   - Controller node: 
@@ -104,7 +104,7 @@ Các bước:
 11. Port của máy ảo trên provider bridge(15) nhận và chuyển tiếp gói tin đến interface của máy ảo 2 (16) thông qua *veth pair* .
 
 
-## Trong mô hình mạng Self-service
+### 3.2 Trong mô hình mạng Self-service
 ### Ví dụ về mô hình mạng Self-service sử dụng 
 - Ví dụ về kiến trúc mạng sefl service:
 
