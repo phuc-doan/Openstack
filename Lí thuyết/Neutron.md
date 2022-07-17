@@ -72,7 +72,7 @@ Các bước sau mô tả luồng đi của gói tin được gửi từ máy �
 ![](https://i.imgur.com/D7XNhdB.png)
 
 Các bước sau mô tả luồng đi của gói tin được gửi từ một máy ảo đến máy ảo khác trong cùng provider network nhưng trên hai compute node khác nhau:
-1. Interface của máy ảo(1) gửi gói tin đến  port của máy ảo(2) trên provider bridge thông qua **veth pair**
+1.Interface trên máy ảo(1) chuyển gói tin đến port của instance trên bridge(2) thông qua *veth pair*.
 2. Security group rule(3) sẽ xử lý firewall và theo dõi kết nối 
 3. Vlan Sub-interface port(4) chuyển tiếp gói tin đến interface vật lý(5) của compute node mà kết nối đến mạng provider.
 4. Interface vật lý(5) thêm vlan tag và chuyển tiếp gói tin đến provider switch(6) trong hạ tâng mạng vật lý.
