@@ -72,14 +72,13 @@ Các bước sau mô tả luồng đi của gói tin được gửi từ máy �
 ![](https://i.imgur.com/D7XNhdB.png)
 
 Các bước sau mô tả luồng đi của gói tin được gửi từ một máy ảo đến máy ảo khác trong cùng provider network nhưng trên hai compute node khác nhau:
-1.Interface trên máy ảo(1) chuyển gói tin đến port của instance trên bridge(2) thông qua *veth pair*.
-2. Security group rule(3) sẽ xử lý firewall và theo dõi kết nối 
-3. Vlan Sub-interface port(4) chuyển tiếp gói tin đến interface vật lý(5) của compute node mà kết nối đến mạng provider.
-4. Interface vật lý(5) thêm vlan tag và chuyển tiếp gói tin đến provider switch(6) trong hạ tâng mạng vật lý.
-5. Switch chuyển tiếp gói tin từ compute node 1 đến compute node 2.
-6. Interface mạng vật lý của compute 2(8) gỡ vlan tag trên gói tin và chuyển tiế nó đến vlan sub-interface port(9) trên provider bridge.
-7. Security group rule(10) trên provider bridge xử lý tường lửa và theo dõi kết nối cho gói tin.
-8. port của máy ảo trên provider bridge(11) nhận và chuyển tiếp gói tin đến interface của máy ảo(12) thông qua *veth pair* .
+1. Interface trên máy ảo(1) chuyển gói tin đến port của instance trên bridge(2) thông qua *veth pair*.
+2. (3)-(4) là linux bridge dùng các thuật toán xử lý và đẩy gói tin đến int vật lý (5).
+3. Interface vật lý(5) thêm vlan tag và chuyển tiếp gói tin đến provider switch(6) trong hạ tâng mạng vật lý.
+4. Switch chuyển tiếp gói tin từ compute node 1 đến compute node 2.
+5. Interface mạng vật lý của compute 2(8) gỡ vlan tag trên gói tin và chuyển tiế nó đến vlan sub-interface port(9) trên provider bridge.
+6. Security group rule(10) trên provider bridge xử lý tường lửa và theo dõi kết nối cho gói tin.
+7. port của máy ảo trên provider bridge(11) nhận và chuyển tiếp gói tin đến interface của máy ảo(12) thông qua *veth pair* .
 
 
 
@@ -92,16 +91,15 @@ Trong kịch bản này sẽ giải thích các bước trong luồng đi của 
 
 Các bước:
 1. Interface của máy ảo 1(1) chuyển tiếp gói tin đến port của máy ảo(2) trên Provider bridge thông qua **veth pair**.
-2. Security group rules(3) trên Provider bridge xử lý tường lửa và theo dõi kết nối cho gói tin.
-3. VLAN sub-interface(4) trên provider bridge chuyển tiếp gói tin đến interface vật lý(5).
-4. Interface vật lý(5) thêm vlan 101 tag và chuyển tiếp gói tin đến provider switch(6) trong hạ tâng mạng vật lý.
-5. Switch  gỡ vlan 101 tag trên gói tin và chuyển cho router(7).
-6. Router định tuyến gói tin từ mạng provider 1(8) đến mạng provider 2(9).
-7. Router chuyển hướng gói tin đến switch(10).
-8. Switch gắn vlan 102 tag cho gói tin và chuyển gói tin đến compute 1(11).
-9. Interface vật lý trên compute 1 (12) gỡ vlan 102 tag và chuyển cho Vlan sub-interface port trên provider bridge của mạng provider 2.
-10. Security group rule(14) trên provider bridge xử lý tường lửa và theo dõi kết nối cho gói tin.
-11. Port của máy ảo trên provider bridge(15) nhận và chuyển tiếp gói tin đến interface của máy ảo 2 (16) thông qua *veth pair* .
+2. (3)-(4) là linux bridge dùng các thuật toán xử lý và đẩy gói tin đến int vật lý (5).
+3. Interface vật lý(5) thêm vlan 101 tag và chuyển tiếp gói tin đến provider switch(6) trong hạ tâng mạng vật lý.
+4. Switch  gỡ vlan 101 tag trên gói tin và chuyển cho router(7).
+5. Router định tuyến gói tin từ mạng provider 1(8) đến mạng provider 2(9).
+6. Router chuyển hướng gói tin đến switch(10).
+7. Switch gắn vlan 102 tag cho gói tin và chuyển gói tin đến compute 1(11).
+8. Interface vật lý trên compute 1 (12) gỡ vlan 102 tag và chuyển cho Vlan sub-interface port trên provider bridge của mạng provider 2.
+9. Security group rule(14) trên provider bridge xử lý tường lửa và theo dõi kết nối cho gói tin.
+10. Port của máy ảo trên provider bridge(15) nhận và chuyển tiếp gói tin đến interface của máy ảo 2 (16) thông qua *veth pair* .
 
 
 ### 3.2 Trong mô hình mạng Self-service
